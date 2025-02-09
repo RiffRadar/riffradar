@@ -19,7 +19,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body>
-                <div className="h-full flex flex-col gap-4 p-4  border border-red-800">
+                <div className="h-full flex flex-col gap-4 p-4">
                     <Navbar />
 
                     <div className="flex h-full gap-4">
