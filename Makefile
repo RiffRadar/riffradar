@@ -27,6 +27,12 @@ sf-cache-clear :
 sf-make-migration :
 	docker compose exec composer_sf php bin/console make:migration
 
+sf-migrate :
+	docker compose exec composer_sf php bin/console doctrine:migrations:migrate 
+
+sf-create-database :
+	docker compose exec composer_sf php bin/console doctrine:database:create --if-not-exists
+
 #Next
 next-install :
 	docker compose exec nextjs npm install
