@@ -2,12 +2,16 @@ FROM node:18
 
 WORKDIR /app
 
-COPY ../../frontend/package.json ../../frontend/package-lock.json ./
+COPY frontend/package.json frontend/package-lock.json ./
 
 RUN npm install
 
-COPY ../../frontend .
+RUN npm install -g nodemon
+
+COPY frontend .
+
+RUN npm run build
 
 EXPOSE 3000
 
-CMD ["npm", "run", "dev"]
+CMD ["nodemon", "-L", "--watch", ".", "--exec", "npm", "run", "dev"]
