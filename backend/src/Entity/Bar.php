@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\BarRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -37,6 +39,17 @@ class Bar
 
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
     private ?array $service = null;
+
+    /**
+     * @var Collection<int, Disponibility>
+     */
+    #[ORM\OneToMany(targetEntity: Disponibility::class, mappedBy: 'bar_id')]
+    private Collection $disponibilities;
+
+    public function __construct()
+    {
+        $this->disponibilities = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -135,6 +148,36 @@ class Bar
     public function setService(?array $service): static
     {
         $this->service = $service;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Disponibility>
+     */
+    public function getDisponibilities(): Collection
+    {
+        return $this->disponibilities;
+    }
+
+    public function addDisponibility(Disponibility $disponibility): static
+    {
+        if (!$this->disponibilities->contains($disponibility)) {
+            $this->disponibilities->add($disponibility);
+            $disponibility->setBarId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDisponibility(Disponibility $disponibility): static
+    {
+        if ($this->disponibilities->removeElement($disponibility)) {
+            // set the owning side to null (unless already changed)
+            if ($disponibility->getBarId() === $this) {
+                $disponibility->setBarId(null);
+            }
+        }
 
         return $this;
     }
