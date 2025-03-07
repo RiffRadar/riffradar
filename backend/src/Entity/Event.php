@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\EventRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -30,6 +32,17 @@ class Event
 
     #[ORM\Column(length: 50)]
     private ?string $enum = null;
+
+    /**
+     * @var Collection<int, SubscribedEvent>
+     */
+    #[ORM\OneToMany(targetEntity: SubscribedEvent::class, mappedBy: 'eventid')]
+    private Collection $subscribedEvents;
+
+    public function __construct()
+    {
+        $this->subscribedEvents = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -92,6 +105,36 @@ class Event
     public function setEnum(string $enum): static
     {
         $this->enum = $enum;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, SubscribedEvent>
+     */
+    public function getSubscribedEvents(): Collection
+    {
+        return $this->subscribedEvents;
+    }
+
+    public function addSubscribedEvent(SubscribedEvent $subscribedEvent): static
+    {
+        if (!$this->subscribedEvents->contains($subscribedEvent)) {
+            $this->subscribedEvents->add($subscribedEvent);
+            $subscribedEvent->setEventid($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSubscribedEvent(SubscribedEvent $subscribedEvent): static
+    {
+        if ($this->subscribedEvents->removeElement($subscribedEvent)) {
+            // set the owning side to null (unless already changed)
+            if ($subscribedEvent->getEventid() === $this) {
+                $subscribedEvent->setEventid(null);
+            }
+        }
 
         return $this;
     }
