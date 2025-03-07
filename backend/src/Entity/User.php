@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -32,6 +34,17 @@ class User
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $tokenDate = null;
+
+    /**
+     * @var Collection<int, UserBar>
+     */
+    #[ORM\OneToMany(targetEntity: UserBar::class, mappedBy: 'user_id')]
+    private Collection $userBars;
+
+    public function __construct()
+    {
+        $this->userBars = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -106,6 +119,36 @@ class User
     public function setTokenDate(?\DateTimeInterface $tokenDate): static
     {
         $this->tokenDate = $tokenDate;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserBar>
+     */
+    public function getUserBars(): Collection
+    {
+        return $this->userBars;
+    }
+
+    public function addUserBar(UserBar $userBar): static
+    {
+        if (!$this->userBars->contains($userBar)) {
+            $this->userBars->add($userBar);
+            $userBar->setUserId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserBar(UserBar $userBar): static
+    {
+        if ($this->userBars->removeElement($userBar)) {
+            // set the owning side to null (unless already changed)
+            if ($userBar->getUserId() === $this) {
+                $userBar->setUserId(null);
+            }
+        }
 
         return $this;
     }

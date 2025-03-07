@@ -46,9 +46,16 @@ class Bar
     #[ORM\OneToMany(targetEntity: Disponibility::class, mappedBy: 'bar_id')]
     private Collection $disponibilities;
 
+    /**
+     * @var Collection<int, UserBar>
+     */
+    #[ORM\OneToMany(targetEntity: UserBar::class, mappedBy: 'bar_id')]
+    private Collection $userBars;
+
     public function __construct()
     {
         $this->disponibilities = new ArrayCollection();
+        $this->userBars = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -176,6 +183,36 @@ class Bar
             // set the owning side to null (unless already changed)
             if ($disponibility->getBarId() === $this) {
                 $disponibility->setBarId(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserBar>
+     */
+    public function getUserBars(): Collection
+    {
+        return $this->userBars;
+    }
+
+    public function addUserBar(UserBar $userBar): static
+    {
+        if (!$this->userBars->contains($userBar)) {
+            $this->userBars->add($userBar);
+            $userBar->setBarId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserBar(UserBar $userBar): static
+    {
+        if ($this->userBars->removeElement($userBar)) {
+            // set the owning side to null (unless already changed)
+            if ($userBar->getBarId() === $this) {
+                $userBar->setBarId(null);
             }
         }
 
