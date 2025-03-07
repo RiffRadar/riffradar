@@ -27,9 +27,16 @@ class Category
     #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'category_id')]
     private Collection $categories;
 
+    /**
+     * @var Collection<int, Band>
+     */
+    #[ORM\ManyToMany(targetEntity: Band::class, mappedBy: 'categories')]
+    private Collection $bands;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
+        $this->bands = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -86,6 +93,33 @@ class Category
             if ($category->getCategoryId() === $this) {
                 $category->setCategoryId(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Band>
+     */
+    public function getBands(): Collection
+    {
+        return $this->bands;
+    }
+
+    public function addBand(Band $band): static
+    {
+        if (!$this->bands->contains($band)) {
+            $this->bands->add($band);
+            $band->addCategory($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBand(Band $band): static
+    {
+        if ($this->bands->removeElement($band)) {
+            $band->removeCategory($this);
         }
 
         return $this;
