@@ -41,9 +41,16 @@ class User
     #[ORM\OneToMany(targetEntity: UserBar::class, mappedBy: 'user_id')]
     private Collection $userBars;
 
+    /**
+     * @var Collection<int, UserBand>
+     */
+    #[ORM\OneToMany(targetEntity: UserBand::class, mappedBy: 'userid')]
+    private Collection $userBands;
+
     public function __construct()
     {
         $this->userBars = new ArrayCollection();
+        $this->userBands = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -147,6 +154,36 @@ class User
             // set the owning side to null (unless already changed)
             if ($userBar->getUserId() === $this) {
                 $userBar->setUserId(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserBand>
+     */
+    public function getUserBands(): Collection
+    {
+        return $this->userBands;
+    }
+
+    public function addUserBand(UserBand $userBand): static
+    {
+        if (!$this->userBands->contains($userBand)) {
+            $this->userBands->add($userBand);
+            $userBand->setUserid($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserBand(UserBand $userBand): static
+    {
+        if ($this->userBands->removeElement($userBand)) {
+            // set the owning side to null (unless already changed)
+            if ($userBand->getUserid() === $this) {
+                $userBand->setUserid(null);
             }
         }
 

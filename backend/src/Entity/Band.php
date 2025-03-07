@@ -34,9 +34,16 @@ class Band
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'bands')]
     private Collection $categories;
 
+    /**
+     * @var Collection<int, UserBand>
+     */
+    #[ORM\OneToMany(targetEntity: UserBand::class, mappedBy: 'bandid')]
+    private Collection $userBands;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
+        $this->userBands = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -112,6 +119,36 @@ class Band
     public function removeCategory(Category $category): static
     {
         $this->categories->removeElement($category);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserBand>
+     */
+    public function getUserBands(): Collection
+    {
+        return $this->userBands;
+    }
+
+    public function addUserBand(UserBand $userBand): static
+    {
+        if (!$this->userBands->contains($userBand)) {
+            $this->userBands->add($userBand);
+            $userBand->setBandid($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserBand(UserBand $userBand): static
+    {
+        if ($this->userBands->removeElement($userBand)) {
+            // set the owning side to null (unless already changed)
+            if ($userBand->getBandid() === $this) {
+                $userBand->setBandid(null);
+            }
+        }
 
         return $this;
     }
