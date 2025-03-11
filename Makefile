@@ -17,6 +17,10 @@ d-stop :
 d-restart :
 	docker compose restart
 
+#Composer
+composer-install :
+	docker compose exec composer_sf composer install
+
 #Symfony
 sf-make-entity :
 	docker compose exec composer_sf php bin/console make:entity $(entity)
@@ -42,6 +46,3 @@ next-dev :
 
 next-build :
 	docker compose exec nextjs npm run build
-
-
-
