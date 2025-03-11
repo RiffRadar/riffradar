@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\RolesEnum;
 use App\Repository\UserBandRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -21,8 +22,8 @@ class UserBand
     #[ORM\JoinColumn(nullable: false)]
     private ?Band $bandid = null;
 
-    #[ORM\Column(length: 50)]
-    private ?string $enum = null;
+    #[ORM\Column(type: 'string', length: 50, enumType: RolesEnum::class)]
+    private RolesEnum $role;
 
     public function getId(): ?int
     {
@@ -53,14 +54,14 @@ class UserBand
         return $this;
     }
 
-    public function getEnum(): ?string
+        public function getRole(): RolesEnum
     {
-        return $this->enum;
+        return $this->role;
     }
 
-    public function setEnum(string $enum): static
+    public function setRole(RolesEnum $role): static
     {
-        $this->enum = $enum;
+        $this->role = $role;
 
         return $this;
     }

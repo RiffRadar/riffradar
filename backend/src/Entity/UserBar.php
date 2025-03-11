@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\RolesEnum;
 use App\Repository\UserBarRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -20,6 +21,9 @@ class UserBar
     #[ORM\ManyToOne(inversedBy: 'userBars')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Bar $bar_id = null;
+
+    #[ORM\Column(type: 'string', length: 50, enumType: RolesEnum::class)]
+    private RolesEnum $role;
 
     public function getId(): ?int
     {
@@ -46,6 +50,18 @@ class UserBar
     public function setBarId(?Bar $bar_id): static
     {
         $this->bar_id = $bar_id;
+
+        return $this;
+    }
+
+    public function getRole(): RolesEnum
+    {
+        return $this->role;
+    }
+
+    public function setRole(RolesEnum $role): static
+    {
+        $this->role = $role;
 
         return $this;
     }

@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\StatusEnum;
 use App\Repository\EventRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -30,8 +31,8 @@ class Event
     #[ORM\Column(type: Types::TIME_MUTABLE)]
     private ?\DateTimeInterface $time = null;
 
-    #[ORM\Column(length: 50)]
-    private ?string $enum = null;
+   #[ORM\Column(type: 'string', length: 50, enumType: StatusEnum::class)]
+    private StatusEnum $status;
 
     /**
      * @var Collection<int, SubscribedEvent>
@@ -97,18 +98,6 @@ class Event
         return $this;
     }
 
-    public function getEnum(): ?string
-    {
-        return $this->enum;
-    }
-
-    public function setEnum(string $enum): static
-    {
-        $this->enum = $enum;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, SubscribedEvent>
      */
@@ -135,6 +124,18 @@ class Event
                 $subscribedEvent->setEventid(null);
             }
         }
+
+        return $this;
+    }
+    
+    public function getStatus(): StatusEnum
+    {
+        return $this->status;
+    }
+
+    public function setRole(StatusEnum $status): static
+    {
+        $this->status = $status;
 
         return $this;
     }
