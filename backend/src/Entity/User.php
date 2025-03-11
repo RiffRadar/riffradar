@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -32,6 +34,31 @@ class User
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $tokenDate = null;
+
+    /**
+     * @var Collection<int, UserBar>
+     */
+    #[ORM\OneToMany(targetEntity: UserBar::class, mappedBy: 'user_id')]
+    private Collection $userBars;
+
+    /**
+     * @var Collection<int, UserBand>
+     */
+    #[ORM\OneToMany(targetEntity: UserBand::class, mappedBy: 'userid')]
+    private Collection $userBands;
+
+    /**
+     * @var Collection<int, SubscribedEvent>
+     */
+    #[ORM\OneToMany(targetEntity: SubscribedEvent::class, mappedBy: 'userid')]
+    private Collection $subscribedEvents;
+
+    public function __construct()
+    {
+        $this->userBars = new ArrayCollection();
+        $this->userBands = new ArrayCollection();
+        $this->subscribedEvents = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -106,6 +133,96 @@ class User
     public function setTokenDate(?\DateTimeInterface $tokenDate): static
     {
         $this->tokenDate = $tokenDate;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserBar>
+     */
+    public function getUserBars(): Collection
+    {
+        return $this->userBars;
+    }
+
+    public function addUserBar(UserBar $userBar): static
+    {
+        if (!$this->userBars->contains($userBar)) {
+            $this->userBars->add($userBar);
+            $userBar->setUserId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserBar(UserBar $userBar): static
+    {
+        if ($this->userBars->removeElement($userBar)) {
+            // set the owning side to null (unless already changed)
+            if ($userBar->getUserId() === $this) {
+                $userBar->setUserId(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserBand>
+     */
+    public function getUserBands(): Collection
+    {
+        return $this->userBands;
+    }
+
+    public function addUserBand(UserBand $userBand): static
+    {
+        if (!$this->userBands->contains($userBand)) {
+            $this->userBands->add($userBand);
+            $userBand->setUserid($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserBand(UserBand $userBand): static
+    {
+        if ($this->userBands->removeElement($userBand)) {
+            // set the owning side to null (unless already changed)
+            if ($userBand->getUserid() === $this) {
+                $userBand->setUserid(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, SubscribedEvent>
+     */
+    public function getSubscribedEvents(): Collection
+    {
+        return $this->subscribedEvents;
+    }
+
+    public function addSubscribedEvent(SubscribedEvent $subscribedEvent): static
+    {
+        if (!$this->subscribedEvents->contains($subscribedEvent)) {
+            $this->subscribedEvents->add($subscribedEvent);
+            $subscribedEvent->setUserid($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSubscribedEvent(SubscribedEvent $subscribedEvent): static
+    {
+        if ($this->subscribedEvents->removeElement($subscribedEvent)) {
+            // set the owning side to null (unless already changed)
+            if ($subscribedEvent->getUserid() === $this) {
+                $subscribedEvent->setUserid(null);
+            }
+        }
 
         return $this;
     }
