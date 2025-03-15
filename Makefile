@@ -40,6 +40,9 @@ sf-create-database :
 sf-make-controller :
 	docker compose exec composer_sf php bin/console make:controller $(controller)
 
+sf-fixtures-load:
+	docker compose exec composer_sf php bin/console doctrine:fixtures:load
+
 #Next
 next-install :
 	docker compose exec nextjs npm install
