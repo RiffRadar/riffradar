@@ -27,6 +27,22 @@ final class BarController extends AbstractController
         ]);
     }
 
+    #[Route('/all', name: 'bar_list', methods: ['GET'])]
+    public function getAll(): JsonResponse
+    {
+        $bar = $this->barRepository->getAll();
+
+        if (empty($bar)) {
+            return $this->json(['error' => 'Bar not found'], 404);
+        }
+
+        try {
+            return $this->json($bar);
+        } catch (\Exception $exception) {
+            return $this->json(['error' => $exception->getMessage()], 500);
+        }
+    }
+
     #[Route('/{id}', name: 'bar_show', methods: ['GET'])]
     public function show(int $id): JsonResponse
     {
