@@ -33,10 +33,10 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
-    public function findOneUserById(int $id): ?User
+    public function findOneUserById(int $id): ?array
     {
         $findOneUser = $this->createQueryBuilder('user')
-            ->select('user.id, user.email, ')
+            ->select('user.id, user.email, user.firstname, user.lastname')
             ->where('user.id = :id')
             ->setParameter('id', $id);
 
@@ -45,7 +45,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
                 ->getQuery()
                 ->getOneOrNullResult();
         } catch (\Exception $exception) {
-            return null;
+            return [];
         }
     }
 }
