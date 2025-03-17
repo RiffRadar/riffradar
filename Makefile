@@ -37,6 +37,16 @@ sf-migrate :
 sf-create-database :
 	docker compose exec composer_sf php bin/console doctrine:database:create --if-not-exists
 
+sf-make-controller :
+	docker compose exec composer_sf php bin/console make:controller $(controller)
+
+sf-fixtures-load:
+	docker compose exec composer_sf php bin/console doctrine:fixtures:load
+
+#PHP-UNIT
+php-unit :
+	docker compose exec composer_sf vendor/bin/phpunit $(file)
+ 
 #Next
 next-install :
 	docker compose exec nextjs npm install
