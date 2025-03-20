@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\DTO\Bar\NewBarDTO;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -54,6 +55,40 @@ final class BarController extends AbstractController
 
         try {
             return $this->json($bar);
+        } catch (\Exception $exception) {
+            return $this->json(['error' => $exception->getMessage()], 500);
+        }
+    }
+
+    #[Route('/new', name: 'bar_new', methods: ['POST'])]
+    public function new(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if (!$data) {
+            return $this->json(['error' => 'invalid data'], 404);
+        }
+
+        try {
+            $barDTO = new NewBarDTO(
+                $data['name'] ?? '',
+                $data['description'] ?? '',
+                $data['address'] ?? '',
+                $data['postalCode'] ?? '',
+                $data['city'] ?? ''
+            );
+
+            $bar = new Bar();
+            $bar->setName($barDTO->name);
+            $bar->setDescription($barDTO->description);
+            $bar->setAddress($barDTO->address);
+            $bar->setPostalCode($barDTO->postalCode);
+            $bar->setCity($barDTO->city);
+
+            $this->entityManager->persist($bar);
+            $this->entityManager->flush();
+
+            return $this->json($bar, 201);
         } catch (\Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
