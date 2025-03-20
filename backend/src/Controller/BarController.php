@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\DTO\Bar\NewBarDTO;
+use App\DTO\Bar\UpdateBarDTO;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,13 +20,38 @@ final class BarController extends AbstractController
         private BarRepository $barRepository
     ) {}
 
-    #[Route('/', name: 'bar')]
-    public function index(): JsonResponse
+    #[Route('/new', name: 'bar_new', methods: ['POST'])]
+    public function new(Request $request): JsonResponse
     {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/BarController.php',
-        ]);
+        $data = json_decode($request->getContent(), true);
+
+        if (!$data) {
+            return $this->json(['error' => 'invalid data'], 404);
+        }
+
+        try {
+            $barDTO = new NewBarDTO(
+                $data['name'] ?? '',
+                $data['description'] ?? '',
+                $data['address'] ?? '',
+                $data['postalCode'] ?? '',
+                $data['city'] ?? ''
+            );
+
+            $bar = new Bar();
+            $bar->setName($barDTO->name);
+            $bar->setDescription($barDTO->description);
+            $bar->setAddress($barDTO->address);
+            $bar->setPostalCode($barDTO->postalCode);
+            $bar->setCity($barDTO->city);
+
+            $this->entityManager->persist($bar);
+            $this->entityManager->flush();
+
+            return $this->json($bar, 201);
+        } catch (\Exception $exception) {
+            return $this->json(['error' => $exception->getMessage()], 500);
+        }
     }
 
     #[Route('/all', name: 'bar_list', methods: ['GET'])]
@@ -60,8 +86,8 @@ final class BarController extends AbstractController
         }
     }
 
-    #[Route('/new', name: 'bar_new', methods: ['POST'])]
-    public function new(Request $request): JsonResponse
+    #[Route('/{id}/edit', name: 'bar_edit', methods: ['PUT'])]
+    public function update(Bar $bar, Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -70,7 +96,7 @@ final class BarController extends AbstractController
         }
 
         try {
-            $barDTO = new NewBarDTO(
+            $barDTO = new updateBarDTO(
                 $data['name'] ?? '',
                 $data['description'] ?? '',
                 $data['address'] ?? '',
@@ -78,17 +104,15 @@ final class BarController extends AbstractController
                 $data['city'] ?? ''
             );
 
-            $bar = new Bar();
-            $bar->setName($barDTO->name);
-            $bar->setDescription($barDTO->description);
-            $bar->setAddress($barDTO->address);
-            $bar->setPostalCode($barDTO->postalCode);
-            $bar->setCity($barDTO->city);
+            $barDTO->name ?? $bar->setName($barDTO->name);
+            $barDTO->description ?? $bar->setDescription($barDTO->description);
+            $barDTO->address ?? $bar->setAddress($barDTO->address);
+            $barDTO->postalCode ?? $bar->setPostalCode($barDTO->postalCode);
+            $barDTO->city ?? $bar->setCity($barDTO->city);
 
-            $this->entityManager->persist($bar);
             $this->entityManager->flush();
 
-            return $this->json($bar, 201);
+            return $this->json($bar, 200);
         } catch (\Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
