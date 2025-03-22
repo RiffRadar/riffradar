@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\DTO\Bar\DeleteBarDTO;
 use App\DTO\Bar\NewBarDTO;
 use App\DTO\Bar\UpdateBarDTO;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,7 +27,7 @@ final class BarController extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         if (!$data) {
-            return $this->json(['error' => 'invalid data'], 404);
+            return $this->json(['error' => 'invalid data'], 400);
         }
 
         try {
@@ -115,6 +116,31 @@ final class BarController extends AbstractController
             return $this->json($bar, 200);
         } catch (\Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
+        }
+    }
+
+    #[Route('/{id}', name: 'bar_delete', methods: ['DELETE'])]
+    public function delete(Request $request, int $id): JsonResponse
+    {
+        if (!isset($id)) {
+            return $this->json(['error' => 'invalid data'], 400);
+        }
+
+        $barDTO = new DeleteBarDTO($id);
+
+        $bar = $this->barRepository->find($barDTO->id);
+
+        if ($bar === null) {
+            return $this->json(["error" => "bar not found"], 404);
+        }
+
+        try {
+            $this->entityManager->remove($bar);
+            $this->entityManager->flush();
+
+            return $this->json(["message" => "bar deleted"], 200);
+        } catch (\Exception $exception) {
+            return $this->json(["error" => $exception->getMessage()], 500);
         }
     }
 }
