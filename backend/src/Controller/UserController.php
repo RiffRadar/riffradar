@@ -19,7 +19,7 @@ final class UserController extends AbstractController
         private UserRepository $userRepository
     ) {}
 
-    #[Route('/', name: 'app_user')]
+    #[Route('/', name: 'user')]
     public function index(): JsonResponse
     {
         return $this->json([

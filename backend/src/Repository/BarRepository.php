@@ -16,28 +16,33 @@ class BarRepository extends ServiceEntityRepository
         parent::__construct($registry, Bar::class);
     }
 
-    //    /**
-    //     * @return Bar[] Returns an array of Bar objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('b')
-    //            ->andWhere('b.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('b.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function getAll(): ?array
+    {
+        $getAllBar = $this->createQueryBuilder('bar')
+            ->select('bar.id, bar.name, bar.description, bar.address, bar.postalCode, bar.city, bar.telephone');
 
-    //    public function findOneBySomeField($value): ?Bar
-    //    {
-    //        return $this->createQueryBuilder('b')
-    //            ->andWhere('b.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        try {
+            return $getAllBar
+                ->getQuery()
+                ->getArrayResult();
+        } catch (\Exception $exception) {
+            return [];
+        }
+    }
+
+    public function findOneBarById(int $id): ?array
+    {
+        $findOneBar = $this->createQueryBuilder('bar')
+            ->select('bar.id, bar.name, bar.description, bar.address, bar.postalCode, bar.city, bar.telephone')
+            ->where('bar.id = :id')
+            ->setParameter('id', $id);
+
+        try {
+            return $findOneBar
+                ->getQuery()
+                ->getOneOrNullResult();
+        } catch (\Exception $exception) {
+            return [];
+        }
+    }
 }

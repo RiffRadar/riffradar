@@ -20,7 +20,7 @@ class UserFixture extends Fixture
       for ($i = 1; $i <= 10; $i++) {
          $user = new User();
          $user->setEmail("user{$i}@example.com");
-         $user->setPassword($this->userPassword->hashPassword($user, "pass{$i}"));
+         $user->setPassword($this->userPassword->hashPassword($user, "password{$i}"));
          $user->setFirstname("firstname{$i}");
          $user->setLastname("lastname{$i}");
 
