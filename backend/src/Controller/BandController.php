@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\DTO\Band\NewBandDTO;
+use App\DTO\Band\UpdateBandDTO;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\BrowserKit\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -74,6 +75,32 @@ final class BandController extends AbstractController
 
         try {
             return $this->json($bar);
+        } catch (\Exception $exception) {
+            return $this->json(['error' => $exception->getMessage()], 500);
+        }
+    }
+
+    #[Route('/{id}/edit', name: 'band_edit', methods: ['PUT'])]
+    public function update(Band $band, Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if (!$data) {
+            return $this->json(['error' => 'invalid data'], 404);
+        }
+
+        try {
+            $bandDTO = new UpdateBandDTO(
+                $data['name'] ?? '',
+                $data['description'] ?? '',
+            );
+
+            $bandDTO->name ?? $band->setName($bandDTO->name);
+            $bandDTO->description ?? $band->setDescription($bandDTO->description);
+
+            $this->entityManager->flush();
+
+            return $this->json($band, 200);
         } catch (\Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
