@@ -46,4 +46,20 @@ final class BandController extends AbstractController
             return $this->json(['error' => $exception->getMessage()], 500);
         }
     }
+
+    #[Route('/all', name: 'band_list', methods: ['GET'])]
+    public function getAll(): JsonResponse
+    {
+        $band = $this->bandRepository->getAll();
+
+        if (empty($band)) {
+            return $this->json(['error' => 'Band not found'], 404);
+        }
+
+        try {
+            return $this->json($band);
+        } catch (\Exception $exception) {
+            return $this->json(['error' => $exception->getMessage()], 500);
+        }
+    }
 }
