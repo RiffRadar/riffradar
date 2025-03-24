@@ -62,4 +62,20 @@ final class BandController extends AbstractController
             return $this->json(['error' => $exception->getMessage()], 500);
         }
     }
+
+    #[Route('/{id}', name: 'band_show', methods: ['GET'])]
+    public function show(int $id): JsonResponse
+    {
+        $bar = $this->bandRepository->findOneBarById($id);
+
+        if (empty($bar)) {
+            return $this->json(['error' => 'Band not found'], 404);
+        }
+
+        try {
+            return $this->json($bar);
+        } catch (\Exception $exception) {
+            return $this->json(['error' => $exception->getMessage()], 500);
+        }
+    }
 }
