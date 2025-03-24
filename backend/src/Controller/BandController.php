@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\DTO\Band\NewBandDTO;
 use App\DTO\Band\UpdateBandDTO;
+use App\DTO\Band\DeleteBandDTO;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\BrowserKit\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -103,6 +104,31 @@ final class BandController extends AbstractController
             return $this->json($band, 200);
         } catch (\Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
+        }
+    }
+
+    #[Route('/{id}', name: 'band_delete', methods: ['DELETE'])]
+    public function delete(int $id): JsonResponse
+    {
+        if (!isset($id)) {
+            return $this->json(['error' => 'invalid data'], 400);
+        }
+
+        $bandDTO = new DeleteBandDTO($id);
+
+        $band = $this->bandRepository->find($bandDTO->id);
+
+        if ($band === null) {
+            return $this->json(["error" => "band not found"], 404);
+        }
+
+        try {
+            $this->entityManager->remove($band);
+            $this->entityManager->flush();
+
+            return $this->json(["message" => "band deleted"], 200);
+        } catch (\Exception $exception) {
+            return $this->json(["error" => $exception->getMessage()], 500);
         }
     }
 }
