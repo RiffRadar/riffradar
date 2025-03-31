@@ -19,15 +19,6 @@ final class UserController extends AbstractController
         private UserRepository $userRepository
     ) {}
 
-    #[Route('/', name: 'user')]
-    public function index(): JsonResponse
-    {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/UserController.php',
-        ]);
-    }
-
     #[Route('/{id}', name: 'user_show', methods: ['GET'])]
     public function show(int $id): JsonResponse
     {
