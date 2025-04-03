@@ -13,7 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Band;
 use App\Repository\BandRepository;
 
-#[Route('/api/bands')]
+#[Route('/api/band')]
 final class BandController extends AbstractController
 {
     public function __construct(
@@ -52,36 +52,36 @@ final class BandController extends AbstractController
     #[Route('/all', name: 'band_list', methods: ['GET'])]
     public function getAll(): JsonResponse
     {
-        $band = $this->bandRepository->getAll();
+        $band = $this->bandRepository->findAll();
 
         if (empty($band)) {
             return $this->json(['error' => 'Band not found'], 404);
         }
 
         try {
-            return $this->json($band);
+            return $this->json($band, 200);
         } catch (\Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
     }
 
-    #[Route('/{id}', name: 'band_show', methods: ['GET'])]
+    #[Route('/{id}', name: 'band_show', methods: ['GET'], format: 'json')]
     public function show(int $id): JsonResponse
     {
-        $bar = $this->bandRepository->findOneBarById($id);
+        $bar = $this->bandRepository->findOneBy(['id' => $id]);
 
         if (empty($bar)) {
             return $this->json(['error' => 'Band not found'], 404);
         }
 
         try {
-            return $this->json($bar);
+            return $this->json($bar, 200);
         } catch (\Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
     }
 
-    #[Route('/{id}/edit', name: 'band_edit', methods: ['PUT'])]
+    #[Route('/{id}/edit', name: 'band_edit', methods: ['PUT'], format: 'json')]
     public function update(Band $band, Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);

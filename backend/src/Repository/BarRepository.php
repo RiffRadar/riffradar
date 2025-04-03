@@ -15,34 +15,4 @@ class BarRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Bar::class);
     }
-
-    public function getAll(): ?array
-    {
-        $getAllBar = $this->createQueryBuilder('bar')
-            ->select('bar.id, bar.name, bar.description, bar.address, bar.postalCode, bar.city, bar.telephone');
-
-        try {
-            return $getAllBar
-                ->getQuery()
-                ->getArrayResult();
-        } catch (\Exception $exception) {
-            return [];
-        }
-    }
-
-    public function findOneBarById(int $id): ?array
-    {
-        $findOneBar = $this->createQueryBuilder('bar')
-            ->select('bar.id, bar.name, bar.description, bar.address, bar.postalCode, bar.city, bar.telephone')
-            ->where('bar.id = :id')
-            ->setParameter('id', $id);
-
-        try {
-            return $findOneBar
-                ->getQuery()
-                ->getOneOrNullResult();
-        } catch (\Exception $exception) {
-            return [];
-        }
-    }
 }

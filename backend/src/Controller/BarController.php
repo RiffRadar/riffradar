@@ -13,7 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\BarRepository;
 use App\Entity\Bar;
 
-#[Route('/api/bars')]
+#[Route('/api/bar')]
 final class BarController extends AbstractController
 {
     public function __construct(
@@ -55,33 +55,33 @@ final class BarController extends AbstractController
         }
     }
 
-    #[Route('/all', name: 'bar_list', methods: ['GET'])]
+    #[Route('/all', name: 'bar_list', methods: ['GET'], format: 'json')]
     public function getAll(): JsonResponse
     {
-        $bar = $this->barRepository->getAll();
+        $bar = $this->barRepository->findAll();
 
         if (empty($bar)) {
             return $this->json(['error' => 'Bar not found'], 404);
         }
 
         try {
-            return $this->json($bar);
+            return $this->json($bar, 200);
         } catch (\Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
     }
 
-    #[Route('/{id}', name: 'bar_show', methods: ['GET'])]
+    #[Route('/{id}', name: 'bar_show', methods: ['GET'], format: 'json')]
     public function show(int $id): JsonResponse
     {
-        $bar = $this->barRepository->findOneBarById($id);
+        $bar = $this->barRepository->findOneBy(['id' => $id]);
 
-        if (empty($bar)) {
+        if (!$bar) {
             return $this->json(['error' => 'Bar not found'], 404);
         }
 
         try {
-            return $this->json($bar);
+            return $this->json($bar, 200);
         } catch (\Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }

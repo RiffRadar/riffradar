@@ -19,17 +19,18 @@ final class UserController extends AbstractController
         private UserRepository $userRepository
     ) {}
 
-    #[Route('/{id}', name: 'user_show', methods: ['GET'])]
+    #[Route('/{id}', name: 'user_show', methods: ['GET'], format: 'json')]
     public function show(int $id): JsonResponse
     {
-        $user = $this->userRepository->findOneUserById($id);
 
-        if (empty($user)) {
+        $user = $this->userRepository->findOneBy(['id' => $id]);
+
+        if (!$user) {
             return $this->json(['error' => 'User not found'], 404);
         }
 
         try {
-            return $this->json($user);
+            return $this->json($user, 200);
         } catch (\Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
