@@ -8,15 +8,16 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\UserRepository;
-use App\DTO\User\NewUserDTO;
 use App\Entity\User;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/api/user')]
 final class UserController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private UserRepository $userRepository
+        private UserRepository $userRepository,
+        private ValidatorInterface $validator
     ) {}
 
     #[Route('/{id}', name: 'user_show', methods: ['GET'], format: 'json')]
@@ -46,14 +47,17 @@ final class UserController extends AbstractController
         }
 
         try {
-            $userDTO = new NewUserDTO(
-                $data['email'] ?? '',
-                $data['password'] ?? ''
-            );
-
             $user = new User();
-            $user->setEmail($userDTO->email);
-            $user->setPassword($userDTO->password);
+            $user->setEmail($data['email'] ?? '');
+            $user->setPassword(password: $data['password']?? '');
+            $user->setFirstName($data['firstname'] ?? '');
+            $user->setLastName($data['lastname'] ?? ''  );
+
+            $error = $this->validator->validate($user);
+
+            if ($error) {
+                return $this->json($error, 422);
+            }
 
             $this->entityManager->persist($user);
             $this->entityManager->flush();

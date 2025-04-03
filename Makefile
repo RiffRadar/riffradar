@@ -21,6 +21,9 @@ d-restart :
 composer-install :
 	docker compose exec composer_sf composer install
 
+composer-require :
+	docker compose exec composer_sf composer require $(package)
+
 #Symfony
 sf-make-entity :
 	docker compose exec composer_sf php bin/console make:entity $(entity)
