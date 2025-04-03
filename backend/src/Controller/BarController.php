@@ -6,10 +6,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\BarRepository;
 use App\Entity\Bar;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/api/bar')]
 final class BarController extends AbstractController
