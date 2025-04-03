@@ -2,9 +2,6 @@
 
 namespace App\Controller;
 
-use App\DTO\Band\NewBandDTO;
-use App\DTO\Band\UpdateBandDTO;
-use App\DTO\Band\DeleteBandDTO;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\BrowserKit\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -12,6 +9,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Band;
 use App\Repository\BandRepository;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/api/band')]
 final class BandController extends AbstractController
@@ -19,6 +17,7 @@ final class BandController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private BandRepository $bandRepository,
+        private ValidatorInterface $validator
     ) {}
 
     #[Route('/new', name: 'band_new', methods: ['POST'])]
@@ -31,14 +30,15 @@ final class BandController extends AbstractController
         }
 
         try {
-            $bandDTO = new NewBandDTO(
-                $data['name'] ?? '',
-                $data['description'] ?? '',
-            );
-
             $band = new Band();
-            $band->setName($bandDTO->name);
-            $band->setDescription($bandDTO->description);
+            $band->setName($data['name'] ?? '');
+            $band->setDescription($data['description'] ?? '');
+
+            $error = $this->validator->validate($band);
+
+            if ($error) {
+                return $this->json($error, 422);
+            }
 
             $this->entityManager->persist($band);
             $this->entityManager->flush();
@@ -53,10 +53,6 @@ final class BandController extends AbstractController
     public function getAll(): JsonResponse
     {
         $band = $this->bandRepository->findAll();
-
-        if (empty($band)) {
-            return $this->json(['error' => 'Band not found'], 404);
-        }
 
         try {
             return $this->json($band, 200);
@@ -82,7 +78,7 @@ final class BandController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'band_edit', methods: ['PUT'], format: 'json')]
-    public function update(Band $band, Request $request): JsonResponse
+    public function update(int $id, Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -90,14 +86,21 @@ final class BandController extends AbstractController
             return $this->json(['error' => 'invalid data'], 404);
         }
 
-        try {
-            $bandDTO = new UpdateBandDTO(
-                $data['name'] ?? '',
-                $data['description'] ?? '',
-            );
+        $band = $this->bandRepository->findOneBy(['id' => $id]);
 
-            $bandDTO->name ?? $band->setName($bandDTO->name);
-            $bandDTO->description ?? $band->setDescription($bandDTO->description);
+        if (empty($bar)) {
+            return $this->json(['error' => 'Band not found'], 404);
+        }
+
+        try {
+            $band->setName($data['name'] ?? '');
+            $band->setDescription($data['description'] ?? '');
+
+            $error = $this->validator->validate($band);
+
+            if ($error) {
+                return $this->json($error, 422);
+            }
 
             $this->entityManager->flush();
 
@@ -114,12 +117,10 @@ final class BandController extends AbstractController
             return $this->json(['error' => 'invalid data'], 400);
         }
 
-        $bandDTO = new DeleteBandDTO($id);
+        $band = $this->bandRepository->findOneBy(['id' => $id]);
 
-        $band = $this->bandRepository->find($bandDTO->id);
-
-        if ($band === null) {
-            return $this->json(["error" => "band not found"], 404);
+        if (empty($bar)) {
+            return $this->json(['error' => 'Band not found'], 404);
         }
 
         try {

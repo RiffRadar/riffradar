@@ -2,9 +2,6 @@
 
 namespace App\Controller;
 
-use App\DTO\Bar\DeleteBarDTO;
-use App\DTO\Bar\NewBarDTO;
-use App\DTO\Bar\UpdateBarDTO;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,13 +9,15 @@ use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\BarRepository;
 use App\Entity\Bar;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/api/bar')]
 final class BarController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private BarRepository $barRepository
+        private BarRepository $barRepository,
+        private ValidatorInterface $validator
     ) {}
 
     #[Route('/new', name: 'bar_new', methods: ['POST'])]
@@ -31,20 +30,18 @@ final class BarController extends AbstractController
         }
 
         try {
-            $barDTO = new NewBarDTO(
-                $data['name'] ?? '',
-                $data['description'] ?? '',
-                $data['address'] ?? '',
-                $data['postalCode'] ?? '',
-                $data['city'] ?? ''
-            );
-
             $bar = new Bar();
-            $bar->setName($barDTO->name);
-            $bar->setDescription($barDTO->description);
-            $bar->setAddress($barDTO->address);
-            $bar->setPostalCode($barDTO->postalCode);
-            $bar->setCity($barDTO->city);
+            $bar->setName($data['name'] ?? '');
+            $bar->setDescription($data['description'] ?? '');
+            $bar->setAddress($data['address'] ?? '');
+            $bar->setPostalCode($data['postalCode'] ?? '');
+            $bar->setCity($data['city'] ?? '');
+
+            $error = $this->validator->validate($bar);
+
+            if ($error) {
+                return $this->json($error, 422);
+            }
 
             $this->entityManager->persist($bar);
             $this->entityManager->flush();
@@ -59,10 +56,6 @@ final class BarController extends AbstractController
     public function getAll(): JsonResponse
     {
         $bar = $this->barRepository->findAll();
-
-        if (empty($bar)) {
-            return $this->json(['error' => 'Bar not found'], 404);
-        }
 
         try {
             return $this->json($bar, 200);
@@ -88,7 +81,7 @@ final class BarController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'bar_edit', methods: ['PUT'])]
-    public function update(Bar $bar, Request $request): JsonResponse
+    public function update(int $id, Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -96,20 +89,24 @@ final class BarController extends AbstractController
             return $this->json(['error' => 'invalid data'], 404);
         }
 
-        try {
-            $barDTO = new updateBarDTO(
-                $data['name'] ?? '',
-                $data['description'] ?? '',
-                $data['address'] ?? '',
-                $data['postalCode'] ?? '',
-                $data['city'] ?? ''
-            );
+        $bar = $this->barRepository->findOneBy(['id' => $id]);
 
-            $barDTO->name ?? $bar->setName($barDTO->name);
-            $barDTO->description ?? $bar->setDescription($barDTO->description);
-            $barDTO->address ?? $bar->setAddress($barDTO->address);
-            $barDTO->postalCode ?? $bar->setPostalCode($barDTO->postalCode);
-            $barDTO->city ?? $bar->setCity($barDTO->city);
+        if (!$bar) {
+            return $this->json(['error' => 'Bar not found'], 404);
+        }
+
+        try {
+            $bar->setName($data['name']);
+            $bar->setDescription($data['description']);
+            $bar->setAddress($data['address']);
+            $bar->setPostalCode($data['postalCode']);
+            $bar->setCity($data['city']);
+
+            $error = $this->validator->validate($bar);
+
+            if ($error) {
+                return $this->json($error, 422);
+            }
 
             $this->entityManager->flush();
 
@@ -120,18 +117,16 @@ final class BarController extends AbstractController
     }
 
     #[Route('/{id}', name: 'bar_delete', methods: ['DELETE'])]
-    public function delete(Request $request, int $id): JsonResponse
+    public function delete(int $id): JsonResponse
     {
         if (!isset($id)) {
             return $this->json(['error' => 'invalid data'], 400);
         }
 
-        $barDTO = new DeleteBarDTO($id);
+        $bar = $this->barRepository->findOneBy(['id' => $id]);
 
-        $bar = $this->barRepository->find($barDTO->id);
-
-        if ($bar === null) {
-            return $this->json(["error" => "bar not found"], 404);
+        if (!$bar) {
+            return $this->json(['error' => 'Bar not found'], 404);
         }
 
         try {

@@ -43,7 +43,7 @@ final class UserController extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         if (!$data) {
-            return $this->json(['error' => 'invalid data'], 404);
+            return $this->json(['error' => 'invalid data'], 406);
         }
 
         try {
