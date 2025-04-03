@@ -19,36 +19,36 @@ d-restart :
 
 #Composer
 composer-install :
-	docker compose exec composer_sf composer install
+	docker compose exec php composer install
 
 composer-require :
-	docker compose exec composer_sf composer require $(package)
+	docker compose exec php composer require $(package)
 
 #Symfony
 sf-make-entity :
-	docker compose exec composer_sf php bin/console make:entity $(entity)
+	docker compose exec php php bin/console make:entity $(entity)
 
 sf-cache-clear : 
-	docker compose exec composer_sf php bin/console cache:clear
+	docker compose exec php php bin/console cache:clear
 
 sf-make-migration :
-	docker compose exec composer_sf php bin/console make:migration
+	docker compose exec php php bin/console make:migration
 
 sf-migrate :
-	docker compose exec composer_sf php bin/console doctrine:migrations:migrate 
+	docker compose exec php php bin/console doctrine:migrations:migrate 
 
 sf-create-database :
-	docker compose exec composer_sf php bin/console doctrine:database:create --if-not-exists
+	docker compose exec php php bin/console doctrine:database:create --if-not-exists
 
 sf-make-controller :
-	docker compose exec composer_sf php bin/console make:controller $(controller)
+	docker compose exec php php bin/console make:controller $(controller)
 
 sf-fixtures-load:
-	docker compose exec composer_sf php bin/console doctrine:fixtures:load
+	docker compose exec php php bin/console doctrine:fixtures:load
 
 #PHP-UNIT
 php-unit :
-	docker compose exec composer_sf vendor/bin/phpunit $(file)
+	docker compose exec php vendor/bin/phpunit $(file)
  
 #Next
 next-install :

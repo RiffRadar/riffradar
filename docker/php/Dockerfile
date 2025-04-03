@@ -16,15 +16,14 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-RUN nslookup raw.githubusercontent.com
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-WORKDIR /var/www/backend/
+WORKDIR /var/www/html/backend
 
-COPY ./backend /var/www/backend
+COPY ./backend /var/www/html/backend
 
 RUN composer install
 
-RUN chown -R www-data:www-data /var/www/html/
+EXPOSE 9000
 
 CMD ["php-fpm"]
