@@ -7,19 +7,19 @@ services:
             - '8000:80'
         volumes:
             - ./docker/config/config.conf:/etc/nginx/conf.d/default.conf
-            - ./backend:/var/www/backend:delegated
+            - ./backend:/var/www/backend
         depends_on:
             - php
         networks:
             - dev
 
     php:
-        build: ./docker/php/
+        build: docker/php/
         container_name: php
         volumes:
-            - ./backend:/var/www/backend:delegated
-            - ./backend/var:/www/backend/var:delegated
-            - ./backend/vendor:/www/backend/vendor:delegated
+            - ./backend:/var/www/backend
+            - ./backend/var:/var/www/backend/var
+            - ./backend/vendor:/var/www/backend/vendor
             - ./docker/php/php-ini-overrides.ini:/etc/php/8.2/fpm/conf.d/99-overrides.ini
         depends_on:
             - postgres
@@ -44,8 +44,13 @@ services:
             - CHOKIDAR_USEPOLLING=true
 
     postgres:
-        build: ./docker/postgres/
+        image: postgres:17.4
         container_name: postgres
+        environment:
+            - POSTGRES_DB=${POSTGRES_DB}
+            - POSTGRES_USER=${POSTGRES_USER}
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+            - POSTGRES_HOST=${POSTGRES_HOST}
         ports:
             - '5432:5432'
         volumes:
@@ -53,28 +58,13 @@ services:
         networks:
             - dev
 
-    composer_sf:
-        build: ./docker/php/
-        container_name: composer_sf
-        working_dir: /www/backend
-        volumes:
-            - ./backend:/www/backend
-            - ./docker/composer/cache:/tmp/cache
-        tty: true
-        stdin_open: true
-        command: ['bash']
-        env_file:
-            - ./backend/.env
-            - ./backend/.env.local
-        depends_on:
-            - postgres
-            - php
-        networks:
-            - dev
-
     mongodb:
-        build: ./docker/mongodb/
+        image: mongo:6.0
         container_name: mongodb
+        environment:
+            - MONGODB_INITDB_ROOT_USERNAME=${MONGODB_INITDB_ROOT_USERNAME}
+            - MONGODB_INITDB_ROOT_PASSWORD=${MONGODB_INITDB_ROOT_PASSWORD}
+            - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
         ports:
             - '27017:27017'
         volumes:

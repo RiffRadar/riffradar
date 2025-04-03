@@ -18,11 +18,13 @@ RUN apt-get update && apt-get install -y \
 
 RUN nslookup raw.githubusercontent.com
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-WORKDIR /var/www/html
 
-COPY . .
+WORKDIR /var/www/backend/
 
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html
+COPY ./backend /var/www/backend
+
+RUN composer install
+
+RUN chown -R www-data:www-data /var/www/html/
 
 CMD ["php-fpm"]
