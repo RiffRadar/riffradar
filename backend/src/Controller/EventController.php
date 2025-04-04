@@ -11,6 +11,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Event;
 use App\Repository\EventRepository;
+use App\Repository\BandRepository;
+use App\Repository\BarRepository;
 use App\Enum\StatusEnum;
 
 #[Route('/api/event')]
@@ -19,6 +21,8 @@ final class EventController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private EventRepository $eventRepository,
+        private BarRepository $barRepository,
+        private BandRepository $bandRepository,
         private ValidatorInterface $validator
     ) {}
 
@@ -32,9 +36,21 @@ final class EventController extends AbstractController
         }
 
         try {
+            $bar = $this->barRepository->findOneBy(['id' => $data['bar']]);
+
+            if (!$bar) {
+                return $this->json(['error' => 'Bar not found'], 404);
+            }
+    
+            $band = $this->bandRepository->findOneBy(['id' => $data['band']]);
+    
+            if (!$bar) {
+                return $this->json(['error' => 'Band not found'], 404);
+            }
+
             $event = new Event();
-            $event->setBarid($data['bar']);
-            $event->setBandid($data['band']);
+            $event->setBarid($bar);
+            $event->setBandid($band);
             $event->setDate($data['date']);
             $event->setTime($data['time']);
             $event->setStatus(StatusEnum::pending);

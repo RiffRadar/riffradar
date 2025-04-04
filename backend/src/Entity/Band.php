@@ -27,7 +27,7 @@ class Band
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $coverImage = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $embedLink = null;
 
     /**
