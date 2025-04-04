@@ -54,6 +54,18 @@ final class EventController extends AbstractController
         }
     }
 
+    #[Route('/all', name: 'event_list', methods: ['GET'], format: 'json')]
+    public function getAll(): JsonResponse
+    {
+        $events = $this->eventRepository->findAll();
+
+        try {
+            return $this->json($events, 200);
+        } catch (\Exception $exception) {
+            return $this->json(['error' => $exception->getMessage()], 500);
+        }
+    }
+
     #[Route('/{id}', name: 'event_show', methods: ['GET'])]
     public function show(int $id): JsonResponse
     {
