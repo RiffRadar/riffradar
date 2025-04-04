@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Composer\XdebugHandler\Status;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -10,6 +11,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Event;
 use App\Repository\EventRepository;
+use App\Enum\StatusEnum;
 
 #[Route('/api/event')]
 final class EventController extends AbstractController
@@ -31,6 +33,11 @@ final class EventController extends AbstractController
 
         try {
             $event = new Event();
+            $event->setBarid($data['bar']);
+            $event->setBandid($data['band']);
+            $event->setDate($data['date']);
+            $event->setTime($data['time']);
+            $event->setStatus(StatusEnum::pending);
 
             $error = $this->validator->validate($event);
 
