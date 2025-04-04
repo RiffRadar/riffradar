@@ -10,7 +10,7 @@ on:
 
 env:
     REGISTRY: ghcr.io
-    IMAGE_NAME: ${{ github.repository }}
+    IMAGE_NAME:
 
 jobs:
     build-and-push-image:
@@ -25,6 +25,12 @@ jobs:
         steps:
             - name: Checkout repository
               uses: actions/checkout@v4
+
+            - name: Image name
+              id: name
+              run: |
+                  IMAGE_NAME = $(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')
+                  echo 'image name = $IMAGE_NAME' >> $GITHUB_OUTPUT
 
             - name: Log in to the Container registry
               uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
