@@ -1,30 +1,29 @@
 FROM php:8.2-fpm
 
-# Installer Composer
-COPY --from=composer:2.5.8 /usr/bin/composer /usr/bin/composer
-
-# Mise à jour et installation des dépendances nécessaires
 RUN apt-get update && apt-get install -y \
     vim \
+    postgresql-client \
     libpq-dev \
     git \
     zip \
     unzip \
     dnsutils \
     libz-dev \
-    && docker-php-ext-install pdo pdo_mysql  \
+    libssl-dev \
+    && docker-php-ext-install pdo pdo_pgsql \
+    && pecl install mongodb \
+    && docker-php-ext-enable mongodb \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-RUN nslookup raw.githubusercontent.com
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-WORKDIR /var/www/html
+WORKDIR /var/www/html/backend
 
-COPY . .
+COPY ./backend /var/www/html/backend
 
-# Donner les droits nécessaires
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html
+RUN composer install
 
-# Pour interagir avec le conteneur
+EXPOSE 9000
+
 CMD ["php-fpm"]
