@@ -81,4 +81,40 @@ final class EventController extends AbstractController
             return $this->json(['error' => $exception->getMessage()], 500);
         }
     }
+
+    #[Route('/{id}/accept', name:'event_accept', methods: ['PUT'])]
+    public function accept(int $id): JsonResponse
+    {
+        $event = $this->eventRepository->findOneBy(['id'=> $id]);
+
+        if (!$event) {
+            return $this->json(['error' => 'Event not found'], 404);
+        }
+
+        try {
+            $event->setStatus(StatusEnum::validated);
+
+            return $this->json($event, 202);
+        } catch (\Exception $exception) {
+            return $this->json(['error' => $exception->getMessage()], 500);
+        }
+    }
+
+    #[Route('/{id}/decline', name:'event_decline', methods: ['PUT'])]
+    public function decline(int $id): JsonResponse
+    {
+        $event = $this->eventRepository->findOneBy(['id'=> $id]);
+
+        if (!$event) {
+            return $this->json(['error' => 'Event not found'], 404);
+        }
+
+        try {
+            $event->setStatus(StatusEnum::refused);
+
+            return $this->json($event, 202);
+        } catch (\Exception $exception) {
+            return $this->json(['error' => $exception->getMessage()], 500);
+        }
+    }
 }
