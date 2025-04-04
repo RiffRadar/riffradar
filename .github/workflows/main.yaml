@@ -39,4 +39,4 @@ jobs:
               with:
                   file: ./backend/php/Dockerfile
                   push: true
-                  tags: ghcr.io/${{ GITHUB_REPOSITORY }}/php:latest
+                  tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/php:latest
