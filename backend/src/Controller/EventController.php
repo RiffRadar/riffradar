@@ -53,4 +53,20 @@ final class EventController extends AbstractController
             return $this->json(['error' => $exception->getMessage()], 500);
         }
     }
+
+    #[Route('/{id}', name: 'event_show', methods: ['GET'])]
+    public function show(int $id): JsonResponse
+    {
+        $event = $this->eventRepository->findOneBy(['id' => $id]);
+
+        if (!$event) {
+            return $this->json(['error' => 'Event not found'], 404);
+        }
+
+        try {
+            return $this->json($event, 200);
+        } catch (\Exception $exception) {
+            return $this->json(['error' => $exception->getMessage()], 500);
+        }
+    }
 }
