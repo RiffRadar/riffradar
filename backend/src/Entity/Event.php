@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 class Event
@@ -19,19 +20,24 @@ class Event
 
     #[ORM\ManyToOne(inversedBy: 'events')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotBlank]
     private ?Bar $barid = null;
 
     #[ORM\ManyToOne(inversedBy: 'events')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotBlank]
     private ?Band $bandid = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Assert\NotBlank]
     private ?\DateTimeInterface $date = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE)]
+    #[Assert\NotBlank]
     private ?\DateTimeInterface $time = null;
 
    #[ORM\Column(type: 'string', length: 50, enumType: StatusEnum::class)]
+   #[Assert\Type(type: StatusEnum::class)]
     private StatusEnum $status;
 
     /**
@@ -98,6 +104,18 @@ class Event
         return $this;
     }
 
+    public function getStatus(): StatusEnum
+    {
+        return $this->status;
+    }
+
+    public function setStatus(StatusEnum $status): static
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, SubscribedEvent>
      */
@@ -128,10 +146,7 @@ class Event
         return $this;
     }
     
-    public function getStatus(): StatusEnum
-    {
-        return $this->status;
-    }
+
 
     public function setRole(StatusEnum $status): static
     {

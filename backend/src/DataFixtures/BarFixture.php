@@ -8,6 +8,8 @@ use Doctrine\Persistence\ObjectManager;
 
 class BarFixture extends Fixture
 {
+   public const BAR_EVENT_REFERENCE = 'bar-event';
+
    public function load(ObjectManager $manager): void
    {
       for ($i = 1; $i <= 10; $i++) {
@@ -22,6 +24,18 @@ class BarFixture extends Fixture
          $manager->persist($bar);
       }
 
+      $barEvent = new Bar();
+      $barEvent->setName("barEvent");
+      $barEvent->setDescription("descriptionBarEvent");
+      $barEvent->setAddress("addressEvent");
+      $barEvent->setPostalCode("PostalCodeEvent");
+      $barEvent->setCity("cityEvent");
+      $barEvent->setTelephone("telephoneEvent");
+
+      $manager->persist($barEvent);
+
       $manager->flush();
+
+      $this->addReference(self::BAR_EVENT_REFERENCE, $barEvent);
    }
 }

@@ -53,10 +53,10 @@ final class BandController extends AbstractController
     #[Route('/all', name: 'band_list', methods: ['GET'])]
     public function getAll(): JsonResponse
     {
-        $band = $this->bandRepository->findAll();
+        $bands = $this->bandRepository->findAll();
 
         try {
-            return $this->json($band, 200);
+            return $this->json($bands, 200);
         } catch (\Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
@@ -65,14 +65,14 @@ final class BandController extends AbstractController
     #[Route('/{id}', name: 'band_show', methods: ['GET'], format: 'json')]
     public function show(int $id): JsonResponse
     {
-        $bar = $this->bandRepository->findOneBy(['id' => $id]);
+        $band = $this->bandRepository->findOneBy(['id' => $id]);
 
-        if (empty($bar)) {
+        if (empty($band)) {
             return $this->json(['error' => 'Band not found'], 404);
         }
 
         try {
-            return $this->json($bar, 200);
+            return $this->json($band, 200);
         } catch (\Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
@@ -89,7 +89,7 @@ final class BandController extends AbstractController
 
         $band = $this->bandRepository->findOneBy(['id' => $id]);
 
-        if (empty($bar)) {
+        if (empty($band)) {
             return $this->json(['error' => 'Band not found'], 404);
         }
 
@@ -120,7 +120,7 @@ final class BandController extends AbstractController
 
         $band = $this->bandRepository->findOneBy(['id' => $id]);
 
-        if (empty($bar)) {
+        if (empty($band)) {
             return $this->json(['error' => 'Band not found'], 404);
         }
 
