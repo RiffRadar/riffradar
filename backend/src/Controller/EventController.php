@@ -2,30 +2,32 @@
 
 namespace App\Controller;
 
+use App\DataTransferObject\CreateEventDTO;
+use App\Enum\StatusEnum;
+use App\Repository\EventRepository;
+use App\Service\EventService;
+use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Serializer\SerializerInterface;
-use Doctrine\ORM\EntityManagerInterface;
-use App\Repository\EventRepository;
-use App\Enum\StatusEnum;
-use App\DataTransferObject\CreateEventDTO;
-use App\Service\EventService;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/api/event')]
 final class EventController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly EventRepository $eventRepository,
-        private readonly ValidatorInterface $validator,
-        private readonly SerializerInterface $serializer,
-        private readonly EventService $eventService
+        private readonly EventRepository        $eventRepository,
+        private readonly ValidatorInterface     $validator,
+        private readonly SerializerInterface    $serializer,
+        private readonly EventService           $eventService
 
-    ) {}
+    )
+    {
+    }
 
     #[Route('/new', name: 'event_new', methods: ['POST'], format: 'json')]
     public function new(Request $request): JsonResponse
@@ -63,6 +65,18 @@ final class EventController extends AbstractController
         }
     }
 
+    #[Route('/open_events', name: 'event_open', methods: ['GET'], format: 'json')]
+    public function getOpenEvents(): JsonResponse
+    {
+        $events = $this->eventRepository->findOpenAndValidated();
+
+        try {
+            return $this->json($events, 200);
+        } catch (Exception $exception) {
+            return $this->json(['error' => $exception->getMessage()], 500);
+        }
+    }
+
     #[Route('/{id}', name: 'event_show', methods: ['GET'], format: 'json')]
     public function show(int $id): JsonResponse
     {
@@ -79,8 +93,8 @@ final class EventController extends AbstractController
         }
     }
 
-    #[Route('/{id}/accept', name: 'event_accept', methods: ['PUT'], format: 'json')]
-    public function accept(int $id): JsonResponse
+    #[Route('/{id}/{status}', name: 'event_accept', methods: ['PUT'], format: 'json')]
+    public function status(int $id, string $status): JsonResponse
     {
         $event = $this->eventRepository->findOneBy(['id' => $id]);
 
@@ -88,29 +102,14 @@ final class EventController extends AbstractController
             return $this->json(['error' => 'Event not found'], 404);
         }
 
-        try {
-            $event->setStatus(StatusEnum::accepted);
+        $statusEnum = StatusEnum::tryFrom($status);
 
-            $this->entityManager->persist($event);
-            $this->entityManager->flush();
-
-            return $this->json($event, 202);
-        } catch (Exception $exception) {
-            return $this->json(['error' => $exception->getMessage()], 500);
-        }
-    }
-
-    #[Route('/{id}/decline', name: 'event_decline', methods: ['PUT'], format: 'json')]
-    public function decline(int $id): JsonResponse
-    {
-        $event = $this->eventRepository->findOneBy(['id' => $id]);
-
-        if (!$event) {
-            return $this->json(['error' => 'Event not found'], 404);
+        if (!$statusEnum) {
+            return $this->json(['error' => 'Invalid status'], 400);
         }
 
         try {
-            $event->setStatus(StatusEnum::declined);
+            $event->setStatus($statusEnum);
 
             $this->entityManager->persist($event);
             $this->entityManager->flush();

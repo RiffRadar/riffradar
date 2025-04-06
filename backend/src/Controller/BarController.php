@@ -2,26 +2,28 @@
 
 namespace App\Controller;
 
+use App\DataTransferObject\BarDTO;
+use App\Entity\Bar;
+use App\Repository\BarRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Serializer\SerializerInterface;
-use Doctrine\ORM\EntityManagerInterface;
-use App\Repository\BarRepository;
-use App\Entity\Bar;
-use App\DataTransferObject\BarDTO;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/api/bar')]
 final class BarController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly BarRepository $barRepository,
-        private readonly ValidatorInterface $validator,
-        private readonly SerializerInterface $serializer
-    ) {}
+        private readonly BarRepository          $barRepository,
+        private readonly ValidatorInterface     $validator,
+        private readonly SerializerInterface    $serializer
+    )
+    {
+    }
 
     #[Route('/new', name: 'bar_new', methods: ['POST'], format: 'json')]
     public function new(Request $request): JsonResponse
@@ -62,10 +64,10 @@ final class BarController extends AbstractController
     #[Route('/all', name: 'bar_list', methods: ['GET'], format: 'json')]
     public function getAll(): JsonResponse
     {
-        $bar = $this->barRepository->findAll();
+        $bars = $this->barRepository->findAll();
 
         try {
-            return $this->json($bar, 200);
+            return $this->json($bars, 200);
         } catch (\Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
