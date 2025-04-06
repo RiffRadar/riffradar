@@ -50,7 +50,7 @@ readonly class EventService
 
           return JsonResponse::fromJsonString($jsonContent, 201);
       } catch (Exception $exception) {
-          return new JsonResponse(['error' => $exception->getMessage()], 501);
+          return new JsonResponse(['error' => $exception->getMessage()], 500);
       }
    }
 }
