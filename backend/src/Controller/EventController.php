@@ -2,69 +2,57 @@
 
 namespace App\Controller;
 
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Entity\Event;
 use App\Repository\EventRepository;
-use App\Repository\BandRepository;
-use App\Repository\BarRepository;
 use App\Enum\StatusEnum;
+use App\DataTransferObject\CreateEventDTO;
+use App\Service\EventService;
 
 #[Route('/api/event')]
 final class EventController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private EventRepository $eventRepository,
-        private BarRepository $barRepository,
-        private BandRepository $bandRepository,
-        private ValidatorInterface $validator
+        private readonly EventRepository $eventRepository,
+        private readonly ValidatorInterface $validator,
+        private readonly SerializerInterface $serializer,
+        private readonly EventService $eventService
+
     ) {}
 
-    #[Route('/new', name: 'event_new', methods: ['POST'])]
+    #[Route('/new', name: 'event_new', methods: ['POST'], format: 'json')]
     public function new(Request $request): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
+        $jsonData = $request->getContent();
 
-        if (!$data) {
+        if (!$jsonData) {
             return $this->json(['error' => 'invalid data'], 400);
         }
 
         try {
-            $bar = $this->barRepository->findOneBy(['id' => $data['bar']]);
+            $eventDTO = $this->serializer->deserialize($jsonData, CreateEventDTO::class, 'json');
 
-            if (!$bar) {
-                return $this->json(['error' => 'Bar not found'], 404);
-            }
-    
-            $band = $this->bandRepository->findOneBy(['id' => $data['band']]);
-    
-            if (!$bar) {
-                return $this->json(['error' => 'Band not found'], 404);
-            }
+            $error = $this->validator->validate($eventDTO);
 
-            $event = new Event();
-            $event->setBarid($bar);
-            $event->setBandid($band);
-            $event->setDate($data['date']);
-            $event->setTime($data['time']);
-            $event->setStatus(StatusEnum::pending);
-
-            $error = $this->validator->validate($event);
-
-            if ($error) {
+            if (count($error) > 0) {
                 return $this->json($error, 422);
             }
 
-            $this->entityManager->persist($event);
-            $this->entityManager->flush();
+            $response = $this->eventService->createEvent($eventDTO);
 
-            return $this->json($event, 201);
-        } catch (\Exception $exception) {
+            if (isset($response['error'])) {
+                return $this->json(['error' => $response['error']], $response['status']);
+            }
+
+            return $this->json($response, 201);
+        } catch (Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
     }
@@ -76,12 +64,12 @@ final class EventController extends AbstractController
 
         try {
             return $this->json($events, 200);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
     }
 
-    #[Route('/{id}', name: 'event_show', methods: ['GET'])]
+    #[Route('/{id}', name: 'event_show', methods: ['GET'], format: 'json')]
     public function show(int $id): JsonResponse
     {
         $event = $this->eventRepository->findOneBy(['id' => $id]);
@@ -92,43 +80,49 @@ final class EventController extends AbstractController
 
         try {
             return $this->json($event, 200);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
     }
 
-    #[Route('/{id}/accept', name:'event_accept', methods: ['PUT'])]
+    #[Route('/{id}/accept', name: 'event_accept', methods: ['PUT'], format: 'json')]
     public function accept(int $id): JsonResponse
     {
-        $event = $this->eventRepository->findOneBy(['id'=> $id]);
+        $event = $this->eventRepository->findOneBy(['id' => $id]);
 
         if (!$event) {
             return $this->json(['error' => 'Event not found'], 404);
         }
 
         try {
-            $event->setStatus(StatusEnum::validated);
+            $event->setStatus(StatusEnum::accepted);
+
+            $this->entityManager->persist($event);
+            $this->entityManager->flush();
 
             return $this->json($event, 202);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
     }
 
-    #[Route('/{id}/decline', name:'event_decline', methods: ['PUT'])]
+    #[Route('/{id}/decline', name: 'event_decline', methods: ['PUT'], format: 'json')]
     public function decline(int $id): JsonResponse
     {
-        $event = $this->eventRepository->findOneBy(['id'=> $id]);
+        $event = $this->eventRepository->findOneBy(['id' => $id]);
 
         if (!$event) {
             return $this->json(['error' => 'Event not found'], 404);
         }
 
         try {
-            $event->setStatus(StatusEnum::refused);
+            $event->setStatus(StatusEnum::declined);
+
+            $this->entityManager->persist($event);
+            $this->entityManager->flush();
 
             return $this->json($event, 202);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
     }

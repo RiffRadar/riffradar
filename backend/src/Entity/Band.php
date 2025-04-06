@@ -143,7 +143,7 @@ class Band
     {
         if (!$this->userBands->contains($userBand)) {
             $this->userBands->add($userBand);
-            $userBand->setBandid($this);
+            $userBand->setBandId($this);
         }
 
         return $this;
@@ -153,8 +153,8 @@ class Band
     {
         if ($this->userBands->removeElement($userBand)) {
             // set the owning side to null (unless already changed)
-            if ($userBand->getBandid() === $this) {
-                $userBand->setBandid(null);
+            if ($userBand->getBandId() === $this) {
+                $userBand->setBandId(null);
             }
         }
 
@@ -173,7 +173,7 @@ class Band
     {
         if (!$this->events->contains($event)) {
             $this->events->add($event);
-            $event->setBandid($this);
+            $event->setBandId($this);
         }
 
         return $this;
@@ -183,8 +183,8 @@ class Band
     {
         if ($this->events->removeElement($event)) {
             // set the owning side to null (unless already changed)
-            if ($event->getBandid() === $this) {
-                $event->setBandid(null);
+            if ($event->getBandId() === $this) {
+                $event->setBandId(null);
             }
         }
 

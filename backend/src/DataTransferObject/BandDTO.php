@@ -4,16 +4,16 @@ namespace App\DataTransferObject;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-class BandDTO
+readonly class BandDTO
 {
    public function __construct(
       #[Assert\NotBlank]
-      public readonly string $name,
+      public string $name,
 
-      public readonly string $description,
+      public string $description,
 
-      public readonly string $coverImage,
+      public string $coverImage,
 
-      public readonly string $embedLink
+      public string $embedLink
    ){}
 }

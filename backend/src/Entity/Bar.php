@@ -42,10 +42,10 @@ class Bar
     private ?array $service = null;
 
     /**
-     * @var Collection<int, Disponibility>
+     * @var Collection<int, Availability>
      */
-    #[ORM\OneToMany(targetEntity: Disponibility::class, mappedBy: 'bar_id')]
-    private Collection $disponibilities;
+    #[ORM\OneToMany(targetEntity: Availability::class, mappedBy: 'bar_id')]
+    private Collection $availabilities;
 
     /**
      * @var Collection<int, UserBar>
@@ -61,7 +61,7 @@ class Bar
 
     public function __construct()
     {
-        $this->disponibilities = new ArrayCollection();
+        $this->availabilities = new ArrayCollection();
         $this->userBars = new ArrayCollection();
         $this->events = new ArrayCollection();
     }
@@ -168,29 +168,29 @@ class Bar
     }
 
     /**
-     * @return Collection<int, Disponibility>
+     * @return Collection<int, Availability>
      */
-    public function getDisponibilities(): Collection
+    public function getAvailabilities(): Collection
     {
-        return $this->disponibilities;
+        return $this->availabilities;
     }
 
-    public function addDisponibility(Disponibility $disponibility): static
+    public function addAvailability(Availability $Availability): static
     {
-        if (!$this->disponibilities->contains($disponibility)) {
-            $this->disponibilities->add($disponibility);
-            $disponibility->setBarId($this);
+        if (!$this->availabilities->contains($Availability)) {
+            $this->availabilities->add($Availability);
+            $Availability->setBarId($this);
         }
 
         return $this;
     }
 
-    public function removeDisponibility(Disponibility $disponibility): static
+    public function removeAvailability(Availability $Availability): static
     {
-        if ($this->disponibilities->removeElement($disponibility)) {
+        if ($this->availabilities->removeElement($Availability)) {
             // set the owning side to null (unless already changed)
-            if ($disponibility->getBarId() === $this) {
-                $disponibility->setBarId(null);
+            if ($Availability->getBarId() === $this) {
+                $Availability->setBarId(null);
             }
         }
 
@@ -239,7 +239,7 @@ class Bar
     {
         if (!$this->events->contains($event)) {
             $this->events->add($event);
-            $event->setBarid($this);
+            $event->setBarId($this);
         }
 
         return $this;
@@ -249,8 +249,8 @@ class Bar
     {
         if ($this->events->removeElement($event)) {
             // set the owning side to null (unless already changed)
-            if ($event->getBarid() === $this) {
-                $event->setBarid(null);
+            if ($event->getBarId() === $this) {
+                $event->setBarId(null);
             }
         }
 

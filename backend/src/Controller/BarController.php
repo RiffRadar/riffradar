@@ -18,8 +18,8 @@ final class BarController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private BarRepository $barRepository,
-        private ValidatorInterface $validator,
+        private readonly BarRepository $barRepository,
+        private readonly ValidatorInterface $validator,
         private readonly SerializerInterface $serializer
     ) {}
 
@@ -37,7 +37,7 @@ final class BarController extends AbstractController
 
             $error = $this->validator->validate($barDTO);
 
-            if ($error) {
+            if (count($error) > 0) {
                 return $this->json($error, 422);
             }
 
@@ -90,7 +90,7 @@ final class BarController extends AbstractController
     #[Route('/{id}/edit', name: 'bar_edit', methods: ['PUT'], format: 'json')]
     public function update(Request $request, int $id): JsonResponse
     {
-        $jsonData = json_decode($request->getContent(), true);
+        $jsonData = $request->getContent();
 
         if (!$jsonData) {
             return $this->json(['error' => 'invalid data'], 404);
@@ -107,7 +107,7 @@ final class BarController extends AbstractController
 
             $error = $this->validator->validate($barDTO);
 
-            if ($error) {
+            if (count($error) > 0) {
                 return $this->json($error, 422);
             }
 

@@ -8,7 +8,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 class Event
@@ -20,24 +19,16 @@ class Event
 
     #[ORM\ManyToOne(inversedBy: 'events')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotBlank]
-    private ?Bar $barid = null;
+    private ?Bar $bar_id = null;
 
     #[ORM\ManyToOne(inversedBy: 'events')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotBlank]
-    private ?Band $bandid = null;
+    private ?Band $band_id = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Assert\NotBlank]
-    private ?\DateTimeInterface $date = null;
-
-    #[ORM\Column(type: Types::TIME_MUTABLE)]
-    #[Assert\NotBlank]
-    private ?\DateTimeInterface $time = null;
+    private ?\DateTimeInterface $dateTime = null;
 
    #[ORM\Column(type: 'string', length: 50, enumType: StatusEnum::class)]
-   #[Assert\Type(type: StatusEnum::class)]
     private StatusEnum $status;
 
     /**
@@ -56,50 +47,38 @@ class Event
         return $this->id;
     }
 
-    public function getBarid(): ?Bar
+    public function getBarId(): ?Bar
     {
-        return $this->barid;
+        return $this->bar_id;
     }
 
-    public function setBarid(?Bar $barid): static
+    public function setBarId(?Bar $bar_id): static
     {
-        $this->barid = $barid;
+        $this->bar_id = $bar_id;
 
         return $this;
     }
 
-    public function getBandid(): ?Band
+    public function getBandId(): ?Band
     {
-        return $this->bandid;
+        return $this->band_id;
     }
 
-    public function setBandid(?Band $bandid): static
+    public function setBandId(?Band $band_id): static
     {
-        $this->bandid = $bandid;
+        $this->band_id = $band_id;
 
         return $this;
     }
 
-    public function getDate(): ?\DateTimeInterface
+    public function getDateTime(): ?\DateTimeInterface
     {
-        return $this->date;
+        return $this->dateTime;
     }
 
-    public function setDate(\DateTimeInterface $date): static
+    public function setDateTime(\DateTimeInterface $dateTime): static
     {
-        $this->date = $date;
-
-        return $this;
-    }
-
-    public function getTime(): ?\DateTimeInterface
-    {
-        return $this->time;
-    }
-
-    public function setTime(\DateTimeInterface $time): static
-    {
-        $this->time = $time;
+        $this->dateTime = $dateTime;
 
         return $this;
     }

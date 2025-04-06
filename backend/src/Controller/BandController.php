@@ -19,15 +19,15 @@ final class BandController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private BandRepository $bandRepository,
-        private ValidatorInterface $validator,
+        private readonly BandRepository $bandRepository,
+        private readonly ValidatorInterface $validator,
         private readonly SerializerInterface $serializer
     ) {}
 
     #[Route('/new', name: 'band_new', methods: ['POST'], format: 'json')]
     public function new(Request $request): JsonResponse
     {
-        $jsonData = json_decode($request->getContent(), true);
+        $jsonData = $request->getContent();
 
         if (!$jsonData) {
             return $this->json(['error' => 'invalid data'], 400);
@@ -38,7 +38,7 @@ final class BandController extends AbstractController
 
             $error = $this->validator->validate($bandDTO);
 
-            if ($error) {
+            if (count($error) > 0) {
                 return $this->json($error, 422);
             }
 
@@ -88,8 +88,7 @@ final class BandController extends AbstractController
     #[Route('/{id}/edit', name: 'band_edit', methods: ['PUT'], format: 'json')]
     public function update(int $id, Request $request): JsonResponse
     {
-        $jsonData = json_decode($request->getContent(), true);
-
+        $jsonData = $request->getContent();
         if (!$jsonData) {
             return $this->json(['error' => 'invalid data'], 404);
         }
@@ -105,7 +104,7 @@ final class BandController extends AbstractController
 
             $error = $this->validator->validate($bandDTO);
 
-            if ($error) {
+            if (count($error) > 0) {
                 return $this->json($error, 422);
             }
 
