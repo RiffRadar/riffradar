@@ -16,8 +16,8 @@ class EventFixtures extends Fixture implements DependentFixtureInterface
    public function load(ObjectManager $manager): void
    {
       $event = new Event();
-      $event->setBarId($this->getReference(BarFixture::BAR_EVENT_REFERENCE, Bar::class));
-      $event->setBandId($this->getReference(BandFixture::BAND_EVENT_REFERENCE, Band::class));
+      $event->setBar($this->getReference(BarFixture::BAR_EVENT_REFERENCE, Bar::class));
+      $event->setBand($this->getReference(BandFixture::BAND_EVENT_REFERENCE, Band::class));
       $event->setDateTime(new DateTime('now'));
       $event->setStatus(StatusEnum::pending);
 

@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\MaxDepth;
 
 
 #[ORM\Entity(repositoryClass: BarRepository::class)]
@@ -44,26 +45,19 @@ class Bar
     /**
      * @var Collection<int, Availability>
      */
-    #[ORM\OneToMany(targetEntity: Availability::class, mappedBy: 'bar_id')]
+    #[ORM\OneToMany(targetEntity: Availability::class, mappedBy: 'bar')]
     private Collection $availabilities;
 
     /**
      * @var Collection<int, UserBar>
      */
-    #[ORM\OneToMany(targetEntity: UserBar::class, mappedBy: 'bar_id')]
+    #[ORM\OneToMany(targetEntity: UserBar::class, mappedBy: 'bar')]
     private Collection $userBars;
-
-    /**
-     * @var Collection<int, Event>
-     */
-    #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'barid')]
-    private Collection $events;
 
     public function __construct()
     {
         $this->availabilities = new ArrayCollection();
         $this->userBars = new ArrayCollection();
-        $this->events = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -179,7 +173,7 @@ class Bar
     {
         if (!$this->availabilities->contains($Availability)) {
             $this->availabilities->add($Availability);
-            $Availability->setBarId($this);
+            $Availability->setBar($this);
         }
 
         return $this;
@@ -189,8 +183,8 @@ class Bar
     {
         if ($this->availabilities->removeElement($Availability)) {
             // set the owning side to null (unless already changed)
-            if ($Availability->getBarId() === $this) {
-                $Availability->setBarId(null);
+            if ($Availability->getBar() === $this) {
+                $Availability->setBar(null);
             }
         }
 
@@ -209,7 +203,7 @@ class Bar
     {
         if (!$this->userBars->contains($userBar)) {
             $this->userBars->add($userBar);
-            $userBar->setBarId($this);
+            $userBar->setBar($this);
         }
 
         return $this;
@@ -219,38 +213,8 @@ class Bar
     {
         if ($this->userBars->removeElement($userBar)) {
             // set the owning side to null (unless already changed)
-            if ($userBar->getBarId() === $this) {
-                $userBar->setBarId(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Event>
-     */
-    public function getEvents(): Collection
-    {
-        return $this->events;
-    }
-
-    public function addEvent(Event $event): static
-    {
-        if (!$this->events->contains($event)) {
-            $this->events->add($event);
-            $event->setBarId($this);
-        }
-
-        return $this;
-    }
-
-    public function removeEvent(Event $event): static
-    {
-        if ($this->events->removeElement($event)) {
-            // set the owning side to null (unless already changed)
-            if ($event->getBarId() === $this) {
-                $event->setBarId(null);
+            if ($userBar->getBar() === $this) {
+                $userBar->setBar(null);
             }
         }
 

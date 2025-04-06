@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\MaxDepth;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 class Event
@@ -19,11 +20,11 @@ class Event
 
     #[ORM\ManyToOne(inversedBy: 'events')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Bar $bar_id = null;
+    private ?Bar $bar = null;
 
     #[ORM\ManyToOne(inversedBy: 'events')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Band $band_id = null;
+    private ?Band $band = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $dateTime = null;
@@ -34,7 +35,7 @@ class Event
     /**
      * @var Collection<int, SubscribedEvent>
      */
-    #[ORM\OneToMany(targetEntity: SubscribedEvent::class, mappedBy: 'eventid')]
+    #[ORM\OneToMany(targetEntity: SubscribedEvent::class, mappedBy: 'event')]
     private Collection $subscribedEvents;
 
     public function __construct()
@@ -47,26 +48,26 @@ class Event
         return $this->id;
     }
 
-    public function getBarId(): ?Bar
+    public function getBar(): ?Bar
     {
-        return $this->bar_id;
+        return $this->bar;
     }
 
-    public function setBarId(?Bar $bar_id): static
+    public function setBar(?Bar $bar): static
     {
-        $this->bar_id = $bar_id;
+        $this->bar = $bar;
 
         return $this;
     }
 
-    public function getBandId(): ?Band
+    public function getBand(): ?Band
     {
-        return $this->band_id;
+        return $this->band;
     }
 
-    public function setBandId(?Band $band_id): static
+    public function setBand(?Band $band): static
     {
-        $this->band_id = $band_id;
+        $this->band = $band;
 
         return $this;
     }
@@ -107,7 +108,7 @@ class Event
     {
         if (!$this->subscribedEvents->contains($subscribedEvent)) {
             $this->subscribedEvents->add($subscribedEvent);
-            $subscribedEvent->setEventid($this);
+            $subscribedEvent->setEvent($this);
         }
 
         return $this;
@@ -117,15 +118,13 @@ class Event
     {
         if ($this->subscribedEvents->removeElement($subscribedEvent)) {
             // set the owning side to null (unless already changed)
-            if ($subscribedEvent->getEventid() === $this) {
-                $subscribedEvent->setEventid(null);
+            if ($subscribedEvent->getEvent() === $this) {
+                $subscribedEvent->setEvent(null);
             }
         }
 
         return $this;
     }
-    
-
 
     public function setRole(StatusEnum $status): static
     {

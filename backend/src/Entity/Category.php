@@ -19,12 +19,12 @@ class Category
     private ?string $name = null;
 
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'categories')]
-    private ?self $category_id = null;
+    private ?self $category = null;
 
     /**
      * @var Collection<int, self>
      */
-    #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'category_id')]
+    #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'category')]
     private Collection $categories;
 
     /**
@@ -56,14 +56,14 @@ class Category
         return $this;
     }
 
-    public function getCategoryId(): ?self
+    public function getCategory(): ?self
     {
-        return $this->category_id;
+        return $this->category;
     }
 
-    public function setCategoryId(?self $category_id): static
+    public function setCategory(?self $category): static
     {
-        $this->category_id = $category_id;
+        $this->category = $category;
 
         return $this;
     }
@@ -80,7 +80,7 @@ class Category
     {
         if (!$this->categories->contains($category)) {
             $this->categories->add($category);
-            $category->setCategoryId($this);
+            $category->setCategory($this);
         }
 
         return $this;
@@ -90,8 +90,8 @@ class Category
     {
         if ($this->categories->removeElement($category)) {
             // set the owning side to null (unless already changed)
-            if ($category->getCategoryId() === $this) {
-                $category->setCategoryId(null);
+            if ($category->getCategory() === $this) {
+                $category->setCategory(null);
             }
         }
 

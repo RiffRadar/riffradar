@@ -9,6 +9,9 @@ use App\Enum\StatusEnum;
 use Doctrine\ORM\EntityManagerInterface;
 use App\DataTransferObject\CreateEventDTO;
 use Exception;
+use PHPUnit\Util\Json;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Serializer\SerializerInterface;
 
 readonly class EventService
 {
@@ -16,35 +19,38 @@ readonly class EventService
       private EntityManagerInterface $entityManager,
       private BarRepository $barRepository,
       private BandRepository $bandRepository,
+      private SerializerInterface $serializer
    ) {}
 
-   public function createEvent(CreateEventDTO $createEventDTO): array
+   public function createEvent(CreateEventDTO $createEventDTO): JsonResponse
    {
       $bar = $this->barRepository->findOneBy(['id' => $createEventDTO->barId]);
 
       if (!$bar) {
-         return ['error' => 'Bar not found', 'status' => '404'];
+         return new JsonResponse(['error' => 'bar not found'], 404);
       }
 
       $band = $this->bandRepository->findOneBy(['id' => $createEventDTO->bandId]);
 
       if (!$band) {
-         return ['error' => 'Band not found', 'status' => '404'];
+          return new JsonResponse(['error' => 'band not found'], 404);
       }
 
       try {
          $event = new Event();
-         $event->setBarId($bar);
-         $event->setBandId($band);
+         $event->setBar($bar);
+         $event->setBand($band);
          $event->setDateTime($createEventDTO->dateTime);
          $event->setStatus(StatusEnum::pending);
 
          $this->entityManager->persist($event);
          $this->entityManager->flush();
 
-         return [$event, 'status' => 201];
+         $jsonContent = $this->serializer->serialize($event, 'json');
+
+          return JsonResponse::fromJsonString($jsonContent, 201);
       } catch (Exception $exception) {
-         return ['error' => $exception->getMessage(), 'status' => 500];
+          return new JsonResponse(['error' => $exception->getMessage()], 501);
       }
    }
 }

@@ -16,7 +16,7 @@ class Availability
 
     #[ORM\ManyToOne(inversedBy: 'availabilities')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Bar $bar_id = null;
+    private ?Bar $bar = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $dateTime = null;
@@ -26,14 +26,14 @@ class Availability
         return $this->id;
     }
 
-    public function getBarId(): ?Bar
+    public function getBar(): ?Bar
     {
-        return $this->bar_id;
+        return $this->bar;
     }
 
-    public function setBarId(?Bar $bar_id): static
+    public function setBar(?Bar $bar): static
     {
-        $this->bar_id = $bar_id;
+        $this->bar = $bar;
 
         return $this;
     }

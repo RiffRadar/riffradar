@@ -45,15 +45,9 @@ final class EventController extends AbstractController
                 return $this->json($error, 422);
             }
 
-            $response = $this->eventService->createEvent($eventDTO);
-
-            if (isset($response['error'])) {
-                return $this->json(['error' => $response['error']], $response['status']);
-            }
-
-            return $this->json($response, 201);
+            return $this->eventService->createEvent($eventDTO);
         } catch (Exception $exception) {
-            return $this->json(['error' => $exception->getMessage()], 500);
+            return $this->json(['error' => $exception->getMessage()], 502);
         }
     }
 

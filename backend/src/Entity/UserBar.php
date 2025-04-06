@@ -16,11 +16,11 @@ class UserBar
 
     #[ORM\ManyToOne(inversedBy: 'userBars')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $user_id = null;
+    private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'userBars')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Bar $bar_id = null;
+    private ?Bar $bar = null;
 
     #[ORM\Column(type: 'string', length: 50, enumType: RolesEnum::class)]
     private RolesEnum $role;
@@ -30,26 +30,26 @@ class UserBar
         return $this->id;
     }
 
-    public function getUserId(): ?User
+    public function getUser(): ?User
     {
-        return $this->user_id;
+        return $this->user;
     }
 
-    public function setUserId(?User $user_id): static
+    public function setUser(?User $user): static
     {
-        $this->user_id = $user_id;
+        $this->user = $user;
 
         return $this;
     }
 
-    public function getBarId(): ?Bar
+    public function getBar(): ?Bar
     {
-        return $this->bar_id;
+        return $this->bar;
     }
 
-    public function setBarId(?Bar $bar_id): static
+    public function setBar(?Bar $bar): static
     {
-        $this->bar_id = $bar_id;
+        $this->bar = $bar;
 
         return $this;
     }
