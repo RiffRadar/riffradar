@@ -7,9 +7,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Band;
 use App\Repository\BandRepository;
+use App\DataTransferObject\BandDTO;
 
 
 #[Route('/api/band')]
@@ -17,29 +19,34 @@ final class BandController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private BandRepository $bandRepository,
-        private ValidatorInterface $validator
+        private readonly BandRepository $bandRepository,
+        private readonly ValidatorInterface $validator,
+        private readonly SerializerInterface $serializer
     ) {}
 
-    #[Route('/new', name: 'band_new', methods: ['POST'])]
+    #[Route('/new', name: 'band_new', methods: ['POST'], format: 'json')]
     public function new(Request $request): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
+        $jsonData = $request->getContent();
 
-        if (!$data) {
+        if (!$jsonData) {
             return $this->json(['error' => 'invalid data'], 400);
         }
 
         try {
-            $band = new Band();
-            $band->setName($data['name'] ?? '');
-            $band->setDescription($data['description'] ?? '');
+            $bandDTO = $this->serializer->deserialize($jsonData, BandDTO::class, 'json');
 
-            $error = $this->validator->validate($band);
+            $error = $this->validator->validate($bandDTO);
 
-            if ($error) {
+            if (count($error) > 0) {
                 return $this->json($error, 422);
             }
+
+            $band = new Band();
+            $band->setName($bandDTO->name);
+            $band->setDescription($bandDTO->description);
+            $band->setCoverImage($bandDTO->coverImage);
+            $band->setEmbedLink($bandDTO->embedLink);
 
             $this->entityManager->persist($band);
             $this->entityManager->flush();
@@ -50,7 +57,7 @@ final class BandController extends AbstractController
         }
     }
 
-    #[Route('/all', name: 'band_list', methods: ['GET'])]
+    #[Route('/all', name: 'band_list', methods: ['GET'], format: 'json')]
     public function getAll(): JsonResponse
     {
         $bands = $this->bandRepository->findAll();
@@ -81,9 +88,8 @@ final class BandController extends AbstractController
     #[Route('/{id}/edit', name: 'band_edit', methods: ['PUT'], format: 'json')]
     public function update(int $id, Request $request): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
-
-        if (!$data) {
+        $jsonData = $request->getContent();
+        if (!$jsonData) {
             return $this->json(['error' => 'invalid data'], 404);
         }
 
@@ -94,14 +100,18 @@ final class BandController extends AbstractController
         }
 
         try {
-            $band->setName($data['name'] ?? '');
-            $band->setDescription($data['description'] ?? '');
+            $bandDTO = $this->serializer->deserialize($jsonData, BandDTO::class, 'json');
 
-            $error = $this->validator->validate($band);
+            $error = $this->validator->validate($bandDTO);
 
-            if ($error) {
+            if (count($error) > 0) {
                 return $this->json($error, 422);
             }
+
+            $band->setName($bandDTO->name);
+            $band->setDescription($bandDTO->description);
+            $band->setCoverImage($bandDTO->coverImage);
+            $band->setEmbedLink($bandDTO->embedLink);
 
             $this->entityManager->flush();
 
@@ -111,7 +121,7 @@ final class BandController extends AbstractController
         }
     }
 
-    #[Route('/{id}', name: 'band_delete', methods: ['DELETE'])]
+    #[Route('/{id}', name: 'band_delete', methods: ['DELETE'], format: 'json')]
     public function delete(int $id): JsonResponse
     {
         if (!isset($id)) {

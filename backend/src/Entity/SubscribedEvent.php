@@ -15,37 +15,37 @@ class SubscribedEvent
 
     #[ORM\ManyToOne(inversedBy: 'subscribedEvents')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $userid = null;
+    private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'subscribedEvents')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Event $eventid = null;
+    private ?Event $event = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getUserid(): ?User
+    public function getUser(): ?User
     {
-        return $this->userid;
+        return $this->user;
     }
 
-    public function setUserid(?User $userid): static
+    public function setUser(?User $user): static
     {
-        $this->userid = $userid;
+        $this->user = $user;
 
         return $this;
     }
 
-    public function getEventid(): ?Event
+    public function getEvent(): ?Event
     {
-        return $this->eventid;
+        return $this->event;
     }
 
-    public function setEventid(?Event $eventid): static
+    public function setEvent(?Event $event): static
     {
-        $this->eventid = $eventid;
+        $this->event = $event;
 
         return $this;
     }

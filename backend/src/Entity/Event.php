@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Attribute\MaxDepth;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 class Event
@@ -20,30 +20,22 @@ class Event
 
     #[ORM\ManyToOne(inversedBy: 'events')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotBlank]
-    private ?Bar $barid = null;
+    private ?Bar $bar = null;
 
     #[ORM\ManyToOne(inversedBy: 'events')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotBlank]
-    private ?Band $bandid = null;
+    private ?Band $band = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Assert\NotBlank]
-    private ?\DateTimeInterface $date = null;
-
-    #[ORM\Column(type: Types::TIME_MUTABLE)]
-    #[Assert\NotBlank]
-    private ?\DateTimeInterface $time = null;
+    private ?\DateTimeInterface $dateTime = null;
 
    #[ORM\Column(type: 'string', length: 50, enumType: StatusEnum::class)]
-   #[Assert\Type(type: StatusEnum::class)]
     private StatusEnum $status;
 
     /**
      * @var Collection<int, SubscribedEvent>
      */
-    #[ORM\OneToMany(targetEntity: SubscribedEvent::class, mappedBy: 'eventid')]
+    #[ORM\OneToMany(targetEntity: SubscribedEvent::class, mappedBy: 'event')]
     private Collection $subscribedEvents;
 
     public function __construct()
@@ -56,50 +48,38 @@ class Event
         return $this->id;
     }
 
-    public function getBarid(): ?Bar
+    public function getBar(): ?Bar
     {
-        return $this->barid;
+        return $this->bar;
     }
 
-    public function setBarid(?Bar $barid): static
+    public function setBar(?Bar $bar): static
     {
-        $this->barid = $barid;
+        $this->bar = $bar;
 
         return $this;
     }
 
-    public function getBandid(): ?Band
+    public function getBand(): ?Band
     {
-        return $this->bandid;
+        return $this->band;
     }
 
-    public function setBandid(?Band $bandid): static
+    public function setBand(?Band $band): static
     {
-        $this->bandid = $bandid;
+        $this->band = $band;
 
         return $this;
     }
 
-    public function getDate(): ?\DateTimeInterface
+    public function getDateTime(): ?\DateTimeInterface
     {
-        return $this->date;
+        return $this->dateTime;
     }
 
-    public function setDate(\DateTimeInterface $date): static
+    public function setDateTime(\DateTimeInterface $dateTime): static
     {
-        $this->date = $date;
-
-        return $this;
-    }
-
-    public function getTime(): ?\DateTimeInterface
-    {
-        return $this->time;
-    }
-
-    public function setTime(\DateTimeInterface $time): static
-    {
-        $this->time = $time;
+        $this->dateTime = $dateTime;
 
         return $this;
     }
@@ -128,7 +108,7 @@ class Event
     {
         if (!$this->subscribedEvents->contains($subscribedEvent)) {
             $this->subscribedEvents->add($subscribedEvent);
-            $subscribedEvent->setEventid($this);
+            $subscribedEvent->setEvent($this);
         }
 
         return $this;
@@ -138,15 +118,13 @@ class Event
     {
         if ($this->subscribedEvents->removeElement($subscribedEvent)) {
             // set the owning side to null (unless already changed)
-            if ($subscribedEvent->getEventid() === $this) {
-                $subscribedEvent->setEventid(null);
+            if ($subscribedEvent->getEvent() === $this) {
+                $subscribedEvent->setEvent(null);
             }
         }
 
         return $this;
     }
-    
-
 
     public function setRole(StatusEnum $status): static
     {

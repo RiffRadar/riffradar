@@ -55,19 +55,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, UserBar>
      */
-    #[ORM\OneToMany(targetEntity: UserBar::class, mappedBy: 'user_id')]
+    #[ORM\OneToMany(targetEntity: UserBar::class, mappedBy: 'user')]
     private Collection $userBars;
 
     /**
      * @var Collection<int, UserBand>
      */
-    #[ORM\OneToMany(targetEntity: UserBand::class, mappedBy: 'userid')]
+    #[ORM\OneToMany(targetEntity: UserBand::class, mappedBy: 'user')]
     private Collection $userBands;
 
     /**
      * @var Collection<int, SubscribedEvent>
      */
-    #[ORM\OneToMany(targetEntity: SubscribedEvent::class, mappedBy: 'userid')]
+    #[ORM\OneToMany(targetEntity: SubscribedEvent::class, mappedBy: 'user')]
     private Collection $subscribedEvents;
 
     public function getId(): ?int
@@ -205,7 +205,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->userBars->contains($userBar)) {
             $this->userBars->add($userBar);
-            $userBar->setUserId($this);
+            $userBar->setUser($this);
         }
 
         return $this;
@@ -215,8 +215,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->userBars->removeElement($userBar)) {
             // set the owning side to null (unless already changed)
-            if ($userBar->getUserId() === $this) {
-                $userBar->setUserId(null);
+            if ($userBar->getUser() === $this) {
+                $userBar->setUser(null);
             }
         }
 
@@ -235,7 +235,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->userBands->contains($userBand)) {
             $this->userBands->add($userBand);
-            $userBand->setUserid($this);
+            $userBand->setUser($this);
         }
 
         return $this;
@@ -245,8 +245,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->userBands->removeElement($userBand)) {
             // set the owning side to null (unless already changed)
-            if ($userBand->getUserid() === $this) {
-                $userBand->setUserid(null);
+            if ($userBand->getUser() === $this) {
+                $userBand->setUser(null);
             }
         }
 
@@ -265,7 +265,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->subscribedEvents->contains($subscribedEvent)) {
             $this->subscribedEvents->add($subscribedEvent);
-            $subscribedEvent->setUserid($this);
+            $subscribedEvent->setUser($this);
         }
 
         return $this;
@@ -275,8 +275,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->subscribedEvents->removeElement($subscribedEvent)) {
             // set the owning side to null (unless already changed)
-            if ($subscribedEvent->getUserid() === $this) {
-                $subscribedEvent->setUserid(null);
+            if ($subscribedEvent->getUser() === $this) {
+                $subscribedEvent->setUser(null);
             }
         }
 

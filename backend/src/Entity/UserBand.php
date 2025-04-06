@@ -16,11 +16,11 @@ class UserBand
 
     #[ORM\ManyToOne(inversedBy: 'userBands')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $userid = null;
+    private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'userBands')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Band $bandid = null;
+    private ?Band $band = null;
 
     #[ORM\Column(type: 'string', length: 50, enumType: RolesEnum::class)]
     private RolesEnum $role;
@@ -30,26 +30,26 @@ class UserBand
         return $this->id;
     }
 
-    public function getUserid(): ?User
+    public function getUser(): ?User
     {
-        return $this->userid;
+        return $this->user;
     }
 
-    public function setUserid(?User $userid): static
+    public function setUser(?User $user): static
     {
-        $this->userid = $userid;
+        $this->user = $user;
 
         return $this;
     }
 
-    public function getBandid(): ?Band
+    public function getBand(): ?Band
     {
-        return $this->bandid;
+        return $this->band;
     }
 
-    public function setBandid(?Band $bandid): static
+    public function setBand(?Band $band): static
     {
-        $this->bandid = $bandid;
+        $this->band = $band;
 
         return $this;
     }

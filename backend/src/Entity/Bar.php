@@ -7,7 +7,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Attribute\MaxDepth;
+
 
 #[ORM\Entity(repositoryClass: BarRepository::class)]
 class Bar
@@ -18,7 +19,6 @@ class Bar
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
@@ -43,28 +43,21 @@ class Bar
     private ?array $service = null;
 
     /**
-     * @var Collection<int, Disponibility>
+     * @var Collection<int, Availability>
      */
-    #[ORM\OneToMany(targetEntity: Disponibility::class, mappedBy: 'bar_id')]
-    private Collection $disponibilities;
+    #[ORM\OneToMany(targetEntity: Availability::class, mappedBy: 'bar')]
+    private Collection $availabilities;
 
     /**
      * @var Collection<int, UserBar>
      */
-    #[ORM\OneToMany(targetEntity: UserBar::class, mappedBy: 'bar_id')]
+    #[ORM\OneToMany(targetEntity: UserBar::class, mappedBy: 'bar')]
     private Collection $userBars;
-
-    /**
-     * @var Collection<int, Event>
-     */
-    #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'barid')]
-    private Collection $events;
 
     public function __construct()
     {
-        $this->disponibilities = new ArrayCollection();
+        $this->availabilities = new ArrayCollection();
         $this->userBars = new ArrayCollection();
-        $this->events = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -169,29 +162,29 @@ class Bar
     }
 
     /**
-     * @return Collection<int, Disponibility>
+     * @return Collection<int, Availability>
      */
-    public function getDisponibilities(): Collection
+    public function getAvailabilities(): Collection
     {
-        return $this->disponibilities;
+        return $this->availabilities;
     }
 
-    public function addDisponibility(Disponibility $disponibility): static
+    public function addAvailability(Availability $Availability): static
     {
-        if (!$this->disponibilities->contains($disponibility)) {
-            $this->disponibilities->add($disponibility);
-            $disponibility->setBarId($this);
+        if (!$this->availabilities->contains($Availability)) {
+            $this->availabilities->add($Availability);
+            $Availability->setBar($this);
         }
 
         return $this;
     }
 
-    public function removeDisponibility(Disponibility $disponibility): static
+    public function removeAvailability(Availability $Availability): static
     {
-        if ($this->disponibilities->removeElement($disponibility)) {
+        if ($this->availabilities->removeElement($Availability)) {
             // set the owning side to null (unless already changed)
-            if ($disponibility->getBarId() === $this) {
-                $disponibility->setBarId(null);
+            if ($Availability->getBar() === $this) {
+                $Availability->setBar(null);
             }
         }
 
@@ -210,7 +203,7 @@ class Bar
     {
         if (!$this->userBars->contains($userBar)) {
             $this->userBars->add($userBar);
-            $userBar->setBarId($this);
+            $userBar->setBar($this);
         }
 
         return $this;
@@ -220,38 +213,8 @@ class Bar
     {
         if ($this->userBars->removeElement($userBar)) {
             // set the owning side to null (unless already changed)
-            if ($userBar->getBarId() === $this) {
-                $userBar->setBarId(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Event>
-     */
-    public function getEvents(): Collection
-    {
-        return $this->events;
-    }
-
-    public function addEvent(Event $event): static
-    {
-        if (!$this->events->contains($event)) {
-            $this->events->add($event);
-            $event->setBarid($this);
-        }
-
-        return $this;
-    }
-
-    public function removeEvent(Event $event): static
-    {
-        if ($this->events->removeElement($event)) {
-            // set the owning side to null (unless already changed)
-            if ($event->getBarid() === $this) {
-                $event->setBarid(null);
+            if ($userBar->getBar() === $this) {
+                $userBar->setBar(null);
             }
         }
 
