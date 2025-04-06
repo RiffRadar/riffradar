@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\AvailabilityRepository;
+use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -19,7 +20,7 @@ class Availability
     private ?Bar $bar = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $dateTime = null;
+    private ?DateTimeInterface $dateTime = null;
 
     public function getId(): ?int
     {
@@ -38,12 +39,12 @@ class Availability
         return $this;
     }
 
-    public function getDateTime(): ?\DateTimeInterface
+    public function getDateTime(): ?DateTimeInterface
     {
         return $this->dateTime;
     }
 
-    public function setDateTime(\DateTimeInterface $dateTime): static
+    public function setDateTime(DateTimeInterface $dateTime): static
     {
         $this->dateTime = $dateTime;
 

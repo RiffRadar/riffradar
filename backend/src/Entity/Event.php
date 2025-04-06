@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Enum\StatusEnum;
 use App\Repository\EventRepository;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -27,7 +28,7 @@ class Event
     private ?Band $band = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $dateTime = null;
+    private ?DateTimeInterface $dateTime = null;
 
    #[ORM\Column(type: 'string', length: 50, enumType: StatusEnum::class)]
     private StatusEnum $status;
@@ -72,12 +73,12 @@ class Event
         return $this;
     }
 
-    public function getDateTime(): ?\DateTimeInterface
+    public function getDateTime(): ?DateTimeInterface
     {
         return $this->dateTime;
     }
 
-    public function setDateTime(\DateTimeInterface $dateTime): static
+    public function setDateTime(DateTimeInterface $dateTime): static
     {
         $this->dateTime = $dateTime;
 

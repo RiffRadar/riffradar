@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -50,7 +51,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $token = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $tokenDate = null;
+    private ?DateTimeInterface $tokenDate = null;
 
     /**
      * @var Collection<int, UserBar>
@@ -181,12 +182,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getTokenDate(): ?\DateTimeInterface
+    public function getTokenDate(): ?DateTimeInterface
     {
         return $this->tokenDate;
     }
 
-    public function setTokenDate(?\DateTimeInterface $tokenDate): static
+    public function setTokenDate(?DateTimeInterface $tokenDate): static
     {
         $this->tokenDate = $tokenDate;
 
