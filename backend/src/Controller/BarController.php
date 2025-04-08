@@ -63,7 +63,7 @@ final class BarController extends AbstractController
     }
 
     #[Route('/all', name: 'bar_list', methods: ['GET'], format: 'json')]
-    public function getAll(): JsonResponse
+    public function all(): JsonResponse
     {
         $bars = $this->barRepository->findAll();
 
@@ -122,8 +122,7 @@ final class BarController extends AbstractController
             $bar->setTelephone($barDTO->telephone);
             $bar->setCoverImage($barDTO->coverImage);
 
-            $error = $this->validator->validate($bar);
-
+            $this->entityManager->persist($bar);
             $this->entityManager->flush();
 
             return $this->json($bar, 200);
@@ -132,7 +131,7 @@ final class BarController extends AbstractController
         }
     }
 
-    #[Route('/{id}', name: 'bar_delete', methods: ['DELETE'], format: 'json')]
+    #[Route('/{id}/delete', name: 'bar_delete', methods: ['DELETE'], format: 'json')]
     public function delete(int $id): JsonResponse
     {
         if (!isset($id)) {

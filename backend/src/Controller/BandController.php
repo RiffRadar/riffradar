@@ -60,7 +60,7 @@ final class BandController extends AbstractController
     }
 
     #[Route('/all', name: 'band_list', methods: ['GET'], format: 'json')]
-    public function getAll(): JsonResponse
+    public function all(): JsonResponse
     {
         $bands = $this->bandRepository->findAll();
 
