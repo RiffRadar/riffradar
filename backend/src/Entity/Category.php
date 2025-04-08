@@ -6,6 +6,7 @@ use App\Repository\CategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 class Category
@@ -25,12 +26,14 @@ class Category
      * @var Collection<int, self>
      */
     #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'category')]
+    #[Ignore]
     private Collection $categories;
 
     /**
      * @var Collection<int, Band>
      */
     #[ORM\ManyToMany(targetEntity: Band::class, mappedBy: 'categories')]
+    #[Ignore]
     private Collection $bands;
 
     public function __construct()
@@ -56,46 +59,12 @@ class Category
         return $this;
     }
 
-    public function getCategory(): ?self
-    {
-        return $this->category;
-    }
-
-    public function setCategory(?self $category): static
-    {
-        $this->category = $category;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, self>
      */
     public function getCategories(): Collection
     {
         return $this->categories;
-    }
-
-    public function addCategory(self $category): static
-    {
-        if (!$this->categories->contains($category)) {
-            $this->categories->add($category);
-            $category->setCategory($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCategory(self $category): static
-    {
-        if ($this->categories->removeElement($category)) {
-            // set the owning side to null (unless already changed)
-            if ($category->getCategory() === $this) {
-                $category->setCategory(null);
-            }
-        }
-
-        return $this;
     }
 
     /**
@@ -116,11 +85,45 @@ class Category
         return $this;
     }
 
+    public function addCategory(self $category): static
+    {
+        if (!$this->categories->contains($category)) {
+            $this->categories->add($category);
+            $category->setCategory($this);
+        }
+
+        return $this;
+    }
+
     public function removeBand(Band $band): static
     {
         if ($this->bands->removeElement($band)) {
             $band->removeCategory($this);
         }
+
+        return $this;
+    }
+
+    public function removeCategory(self $category): static
+    {
+        if ($this->categories->removeElement($category)) {
+            // set the owning side to null (unless already changed)
+            if ($category->getCategory() === $this) {
+                $category->setCategory(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getCategory(): ?self
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?self $category): static
+    {
+        $this->category = $category;
 
         return $this;
     }

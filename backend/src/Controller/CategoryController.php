@@ -48,8 +48,9 @@ final class CategoryController extends AbstractController
             $category->setName($categoryDTO->name);
 
             $parentCategory = $this->categoryRepository->findOneBy(['id' => $categoryDTO->category]);
+
             if ($parentCategory) {
-                $category->addCategory($parentCategory);
+                $parentCategory->addCategory($category);
             }
 
             $this->entityManager->persist($category);
