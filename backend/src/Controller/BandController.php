@@ -2,27 +2,29 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Serializer\SerializerInterface;
-use Doctrine\ORM\EntityManagerInterface;
+use App\DataTransferObject\BandDTO;
 use App\Entity\Band;
 use App\Repository\BandRepository;
-use App\DataTransferObject\BandDTO;
-
+use Doctrine\ORM\EntityManagerInterface;
+use Exception;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/api/band')]
 final class BandController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly BandRepository $bandRepository,
-        private readonly ValidatorInterface $validator,
-        private readonly SerializerInterface $serializer
-    ) {}
+        private readonly BandRepository         $bandRepository,
+        private readonly ValidatorInterface     $validator,
+        private readonly SerializerInterface    $serializer
+    )
+    {
+    }
 
     #[Route('/new', name: 'band_new', methods: ['POST'], format: 'json')]
     public function new(Request $request): JsonResponse
@@ -52,7 +54,7 @@ final class BandController extends AbstractController
             $this->entityManager->flush();
 
             return $this->json($band, 201);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
     }
@@ -64,7 +66,7 @@ final class BandController extends AbstractController
 
         try {
             return $this->json($bands, 200);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
     }
@@ -80,7 +82,7 @@ final class BandController extends AbstractController
 
         try {
             return $this->json($band, 200);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
     }
@@ -116,7 +118,7 @@ final class BandController extends AbstractController
             $this->entityManager->flush();
 
             return $this->json($band, 200);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
     }
@@ -139,7 +141,7 @@ final class BandController extends AbstractController
             $this->entityManager->flush();
 
             return $this->json(["message" => "band deleted"], 200);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return $this->json(["error" => $exception->getMessage()], 500);
         }
     }

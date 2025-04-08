@@ -6,6 +6,7 @@ use App\DataTransferObject\BarDTO;
 use App\Entity\Bar;
 use App\Repository\BarRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -56,7 +57,7 @@ final class BarController extends AbstractController
             $this->entityManager->flush();
 
             return $this->json($bar, 201);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
     }
@@ -68,7 +69,7 @@ final class BarController extends AbstractController
 
         try {
             return $this->json($bars, 200);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
     }
@@ -84,7 +85,7 @@ final class BarController extends AbstractController
 
         try {
             return $this->json($bar, 200);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
     }
@@ -126,7 +127,7 @@ final class BarController extends AbstractController
             $this->entityManager->flush();
 
             return $this->json($bar, 200);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
     }
@@ -149,7 +150,7 @@ final class BarController extends AbstractController
             $this->entityManager->flush();
 
             return $this->json(["message" => "bar deleted"], 200);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return $this->json(["error" => $exception->getMessage()], 500);
         }
     }

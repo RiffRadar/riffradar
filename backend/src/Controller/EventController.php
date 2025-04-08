@@ -24,7 +24,6 @@ final class EventController extends AbstractController
         private readonly ValidatorInterface     $validator,
         private readonly SerializerInterface    $serializer,
         private readonly EventService           $eventService
-
     )
     {
     }
