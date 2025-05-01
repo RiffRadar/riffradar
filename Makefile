@@ -59,3 +59,6 @@ next-dev :
 
 next-build :
 	docker compose exec nextjs npm run build
+
+#SONARQUBE
+	docker compose -f sonarqube/docker-compose.yaml up -d

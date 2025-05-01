@@ -1,0 +1,51 @@
+services:
+  sonarqube:
+    image: sonarqube:community
+    depends_on:
+      - db-sonar
+    ports:
+      - "9000:9000"
+    environment:
+      - SONAR_JDBC_URL=jdbc:postgresql://db-sonar:5432/sonarqube
+      - SONAR_JDBC_USERNAME=riffradar
+      - SONAR_JDBC_PASSWORD=test1234
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/api/system/status" ]
+      interval: 10s
+      retries: 10
+      start_period: 30s
+      timeout: 5s
+
+  db-sonar:
+    image: postgres:17-alpine3.21
+    container_name: db-sonar
+    environment:
+      - POSTGRES_USER=riffradar
+      - POSTGRES_PASSWORD=test1234
+      - POSTGRES_DB=sonarqube
+    volumes:
+      - db-sonar:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+
+  sonar-scanner:
+    image: sonarsource/sonar-scanner-cli
+    container_name: sonar-scanner
+    depends_on:
+      sonarqube:
+        condition: service_healthy
+    environment:
+      SONAR_HOST_URL: "http://sonarqube:9000"
+      SONAR_TOKEN: "sqp_3f648ad169ade1734292588357babe87c22b26cd"
+    volumes:
+      - ../backend:/usr/src
+
+volumes:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+  db-sonar:
