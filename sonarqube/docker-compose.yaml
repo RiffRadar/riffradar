@@ -1,5 +1,5 @@
 services:
-  sonarqube:
+  sonar:
     image: sonarqube:community
     depends_on:
       - db-sonar
@@ -36,11 +36,11 @@ services:
     image: sonarsource/sonar-scanner-cli
     container_name: sonar-scanner
     depends_on:
-      sonarqube:
+      sonar:
         condition: service_healthy
     environment:
-      SONAR_HOST_URL: "http://sonarqube:9000"
-      SONAR_TOKEN: "sqp_3f648ad169ade1734292588357babe87c22b26cd"
+      SONAR_HOST_URL: "http://sonar:9000"
+      SONAR_TOKEN: "sqp_2155ebfe793ec0bc525bd40e487adfa89ffad39f"
     volumes:
       - ../backend:/usr/src
 
