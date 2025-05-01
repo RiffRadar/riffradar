@@ -169,22 +169,22 @@ class Bar
         return $this->availabilities;
     }
 
-    public function addAvailability(Availability $Availability): static
+    public function addAvailability(Availability $availability): static
     {
-        if (!$this->availabilities->contains($Availability)) {
-            $this->availabilities->add($Availability);
-            $Availability->setBar($this);
+        if (!$this->availabilities->contains($availability)) {
+            $this->availabilities->add($availability);
+            $availability->setBar($this);
         }
 
         return $this;
     }
 
-    public function removeAvailability(Availability $Availability): static
+    public function removeAvailability(Availability $availability): static
     {
-        if ($this->availabilities->removeElement($Availability)) {
+        if ($this->availabilities->removeElement($availability)) {
             // set the owning side to null (unless already changed)
-            if ($Availability->getBar() === $this) {
-                $Availability->setBar(null);
+            if ($availability->getBar() === $this) {
+                $availability->setBar(null);
             }
         }
 

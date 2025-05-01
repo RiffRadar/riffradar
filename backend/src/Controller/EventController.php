@@ -52,13 +52,13 @@ final class EventController extends AbstractController
         }
     }
 
-    #[Route('/all', name: 'event_list', methods: ['GET'], format: 'json')]
-    public function getAll(): JsonResponse
+    #[Route('/list', name: 'event_list', methods: ['GET'], format: 'json')]
+    public function list(): JsonResponse
     {
         $events = $this->eventRepository->findAll();
 
         try {
-            return $this->json($events, 200);
+            return $this->json($events);
         } catch (Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
@@ -70,7 +70,7 @@ final class EventController extends AbstractController
         $events = $this->eventRepository->findOpenAndValidated();
 
         try {
-            return $this->json($events, 200);
+            return $this->json($events);
         } catch (Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
@@ -86,7 +86,7 @@ final class EventController extends AbstractController
         }
 
         try {
-            return $this->json($event, 200);
+            return $this->json($event);
         } catch (Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }

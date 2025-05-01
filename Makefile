@@ -65,3 +65,6 @@ sonarqube-build:
 	docker compose -f sonarqube/docker-compose.yaml build
 sonarqube-up:
 	docker compose -f sonarqube/docker-compose.yaml up -d
+
+sonarqube-scanner:
+	docker compose -f sonarqube/docker-compose.yaml run --rm sonar-scanner

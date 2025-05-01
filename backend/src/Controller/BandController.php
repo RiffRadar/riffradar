@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Constant\ErrorMessageConstant;
 use App\DataTransferObject\BandDTO;
 use App\Entity\Band;
 use App\Repository\BandRepository;
@@ -32,7 +33,7 @@ final class BandController extends AbstractController
         $jsonData = $request->getContent();
 
         if (!$jsonData) {
-            return $this->json(['error' => 'invalid data'], 400);
+            return $this->json(['error' => ErrorMessageConstant::INVALID_DATA], 400);
         }
 
         try {
@@ -59,13 +60,13 @@ final class BandController extends AbstractController
         }
     }
 
-    #[Route('/all', name: 'band_list', methods: ['GET'], format: 'json')]
-    public function getAll(): JsonResponse
+    #[Route('/list', name: 'band_list', methods: ['GET'], format: 'json')]
+    public function list(): JsonResponse
     {
         $bands = $this->bandRepository->findAll();
 
         try {
-            return $this->json($bands, 200);
+            return $this->json($bands);
         } catch (Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
@@ -77,11 +78,11 @@ final class BandController extends AbstractController
         $band = $this->bandRepository->findOneBy(['id' => $id]);
 
         if (empty($band)) {
-            return $this->json(['error' => 'Band not found'], 404);
+            return $this->json(['error' => ErrorMessageConstant::ENTITY_NOT_FOUND], 404);
         }
 
         try {
-            return $this->json($band, 200);
+            return $this->json($band);
         } catch (Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
@@ -92,13 +93,13 @@ final class BandController extends AbstractController
     {
         $jsonData = $request->getContent();
         if (!$jsonData) {
-            return $this->json(['error' => 'invalid data'], 404);
+            return $this->json(['error' => ErrorMessageConstant::INVALID_DATA], 404);
         }
 
         $band = $this->bandRepository->findOneBy(['id' => $id]);
 
         if (empty($band)) {
-            return $this->json(['error' => 'Band not found'], 404);
+            return $this->json(['error' => ErrorMessageConstant::ENTITY_NOT_FOUND], 404);
         }
 
         try {
@@ -117,7 +118,7 @@ final class BandController extends AbstractController
 
             $this->entityManager->flush();
 
-            return $this->json($band, 200);
+            return $this->json($band);
         } catch (Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
@@ -127,20 +128,20 @@ final class BandController extends AbstractController
     public function delete(int $id): JsonResponse
     {
         if (!isset($id)) {
-            return $this->json(['error' => 'invalid data'], 400);
+            return $this->json(['error' => ErrorMessageConstant::INVALID_DATA], 400);
         }
 
         $band = $this->bandRepository->findOneBy(['id' => $id]);
 
         if (empty($band)) {
-            return $this->json(['error' => 'Band not found'], 404);
+            return $this->json(['error' => ErrorMessageConstant::ENTITY_NOT_FOUND], 404);
         }
 
         try {
             $this->entityManager->remove($band);
             $this->entityManager->flush();
 
-            return $this->json(["message" => "band deleted"], 200);
+            return $this->json(["message" => "band deleted"]);
         } catch (Exception $exception) {
             return $this->json(["error" => $exception->getMessage()], 500);
         }

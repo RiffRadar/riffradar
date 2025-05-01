@@ -34,7 +34,7 @@ final class UserController extends AbstractController
         }
 
         try {
-            return $this->json($user, 200);
+            return $this->json($user);
         } catch (Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }

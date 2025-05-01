@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Constant\ErrorMessageConstant;
 use App\DataTransferObject\BarDTO;
 use App\Entity\Bar;
 use App\Repository\BarRepository;
@@ -32,7 +33,7 @@ final class BarController extends AbstractController
         $jsonData = $request->getContent();
 
         if (!$jsonData) {
-            return $this->json(['error' => 'invalid data'], 400);
+            return $this->json(['error' => ErrorMessageConstant::INVALID_DATA], 400);
         }
 
         try {
@@ -62,13 +63,13 @@ final class BarController extends AbstractController
         }
     }
 
-    #[Route('/all', name: 'bar_list', methods: ['GET'], format: 'json')]
-    public function getAll(): JsonResponse
+    #[Route('/list', name: 'bar_list', methods: ['GET'], format: 'json')]
+    public function list(): JsonResponse
     {
         $bars = $this->barRepository->findAll();
 
         try {
-            return $this->json($bars, 200);
+            return $this->json($bars);
         } catch (Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
@@ -80,11 +81,11 @@ final class BarController extends AbstractController
         $bar = $this->barRepository->findOneBy(['id' => $id]);
 
         if (!$bar) {
-            return $this->json(['error' => 'Bar not found'], 404);
+            return $this->json(['error' => ErrorMessageConstant::ENTITY_NOT_FOUND], 404);
         }
 
         try {
-            return $this->json($bar, 200);
+            return $this->json($bar);
         } catch (Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
@@ -96,13 +97,13 @@ final class BarController extends AbstractController
         $jsonData = $request->getContent();
 
         if (!$jsonData) {
-            return $this->json(['error' => 'invalid data'], 404);
+            return $this->json(['error' => ErrorMessageConstant::INVALID_DATA], 404);
         }
 
         $bar = $this->barRepository->findOneBy(['id' => $id]);
 
         if (!$bar) {
-            return $this->json(['error' => 'Bar not found'], 404);
+            return $this->json(['error' => ErrorMessageConstant::ENTITY_NOT_FOUND], 404);
         }
 
         try {
@@ -122,11 +123,9 @@ final class BarController extends AbstractController
             $bar->setTelephone($barDTO->telephone);
             $bar->setCoverImage($barDTO->coverImage);
 
-            $error = $this->validator->validate($bar);
-
             $this->entityManager->flush();
 
-            return $this->json($bar, 200);
+            return $this->json($bar);
         } catch (Exception $exception) {
             return $this->json(['error' => $exception->getMessage()], 500);
         }
@@ -136,20 +135,20 @@ final class BarController extends AbstractController
     public function delete(int $id): JsonResponse
     {
         if (!isset($id)) {
-            return $this->json(['error' => 'invalid data'], 400);
+            return $this->json(['error' => ErrorMessageConstant::INVALID_DATA], 400);
         }
 
         $bar = $this->barRepository->findOneBy(['id' => $id]);
 
         if (!$bar) {
-            return $this->json(['error' => 'Bar not found'], 404);
+            return $this->json(['error' => ErrorMessageConstant::ENTITY_NOT_FOUND], 404);
         }
 
         try {
             $this->entityManager->remove($bar);
             $this->entityManager->flush();
 
-            return $this->json(["message" => "bar deleted"], 200);
+            return $this->json(["message" => "bar deleted"]);
         } catch (Exception $exception) {
             return $this->json(["error" => $exception->getMessage()], 500);
         }
